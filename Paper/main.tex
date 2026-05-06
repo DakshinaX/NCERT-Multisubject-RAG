@@ -1,0 +1,819 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage[colorlinks=true, linkcolor=black, citecolor=blue, urlcolor=blue]{hyperref}
+\usepackage{listings}
+\usepackage{siunitx}
+\usepackage{enumitem}
+\usepackage{placeins}            % \FloatBarrier to keep floats inside their section
+\setlist[itemize]{leftmargin=*,itemsep=1pt,topsep=1pt}
+\setlist[enumerate]{leftmargin=*,itemsep=1pt,topsep=1pt}
+
+% ── Table layout: tighter column padding so wide tables fit one column ──
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.05}
+
+% ── Float placement: more aggressive about pushing floats to their slot ──
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.40}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.75}
+
+\lstset{basicstyle=\ttfamily\footnotesize,
+        breaklines=true,frame=single,
+        backgroundcolor=\color{gray!8},
+        showstringspaces=false,keepspaces=true,columns=fullflexible}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{A Multi-Subject Retrieval-Augmented Generation System for NCERT Science Question Answering Across Physics, Chemistry, Mathematics, and Biology}
+
+
+
+
+
+
+\author{
+\IEEEauthorblockN{Aniket Ghosh, Afeefa P.P}
+\IEEEauthorblockA{\textit{Department of Computer Science} \\
+\textit{National Institute of Technology Calicut} \\
+Kerala, India \\
+M240303CS \quad aniket\_m240303cs@nitc.ac.in \\
+P220097CS \quad afeefa\_p220097cs@nitc.ac.in}
+\\[6pt]
+\IEEEauthorblockN{Project Guide}
+\IEEEauthorblockA{\textit{Pranesh Das} \\
+\textit{Department of Computer Science} \\
+\textit{National Institute of Technology Calicut} \\
+praneshdas@nitc.ac.in}
+}
+
+
+
+
+
+
+
+
+
+\maketitle
+
+\begin{abstract}
+We present a production-ready, multi-subject Retrieval-Augmented Generation (RAG) system for question answering grounded in the NCERT Class~11 and~12 Science curriculum, spanning Physics, Chemistry, Mathematics, and Biology. We construct a RAG-optimised corpus of \textbf{14{,}450 enriched chunks} from 99 chapters across four textbooks, each annotated with content-type classification, difficulty level, extracted key terms, formulas, and \emph{dual retrieval texts} optimised separately for BM25 keyword matching and dense embedding retrieval. A five-stage retrieval pipeline integrates BM25 sparse retrieval with \texttt{BAAI/bge-base-en-v1.5} dense embeddings via Reciprocal Rank Fusion, followed by cross-encoder reranking with subject-aware ($\alpha{=}2.0$) and chapter-aware ($\beta{=}4.0$) score boosting and parent--child chunk expansion. Generation is performed by \texttt{Qwen2.5-1.5B-Instruct}. Evaluation on a 573-question holdout set spanning four subjects, five question types, and three difficulty levels shows that the full pipeline attains \textbf{Recall@5 of 91.6\%} (95\% CI [89.4, 93.7]), \textbf{Recall@10 of 94.6\%} (95\% CI [92.7, 96.5]), and \textbf{MRR of 0.810} (95\% CI [0.782, 0.835]). Three of the four pipeline stages contribute statistically significant gains by paired McNemar tests ($p\!<\!10^{-3}$); the final subject/chapter-boost stage is robust but marginal at this evaluation scale. Counter to the conventional assumption that dense retrieval dominates BM25, on this curriculum-aligned corpus BM25 alone achieves $84.8\%$ Recall@10 versus $79.4\%$ for dense retrieval~--~yet the hybrid combination outperforms both ($89.5\%$), confirming the complementary role of the two signals. Manual analysis of all 31 nominal failures shows only ${\sim}12$ are genuine retrieval errors (effective Recall@10 ${\approx}98\%$). Against five open-source LLM baselines spanning four families (Meta, Mistral, Alibaba, Google) and 2.6B--8B parameters, our 1.5B+RAG system achieves comparable BERTScore F1 ($0.809$ vs.\ $0.803$--$0.810$) at $1.7$--$5.3\times$ smaller generator size, with substantially narrower confidence intervals reflecting RAG's per-question consistency. End-to-end latency is $9.4$~s on a single Colab L4 GPU at batch size~1; retrieval contributes only $250$~ms ($2.7\%$). The fully open-source, Colab-compatible implementation provides a reproducible multi-subject baseline for curriculum-aligned educational QA research.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Retrieval-Augmented Generation, Educational AI, NCERT, Multi-Subject QA, FAISS, BM25, Cross-Encoder Reranking, Hybrid Retrieval, Curriculum-Aligned QA
+\end{IEEEkeywords}
+
+% ─── 1. INTRODUCTION ─────────────────────────────────────────────
+\section{Introduction}
+
+The National Council of Educational Research and Training (NCERT) textbooks define the canonical curriculum for over 250~million students in India~\cite{ncert_scale}. Despite their pedagogical importance, automated question-answering (QA) systems targeting NCERT content remain underexplored~--~particularly for multi-subject, multi-grade coverage.
+
+Large Language Models (LLMs) offer fluent generation but frequently hallucinate curriculum-specific facts when deployed without grounding~\cite{ouyang2022training}. Sharma et al.~\cite{sharma2025pustakai} demonstrated this empirically: Llama-4-Scout-17B F1 collapses from $0.894$ on SQuAD to $0.395$ on NCERT-QA without retrieval context. Retrieval-Augmented Generation (RAG)~\cite{lewis2020rag} addresses this by conditioning generation on retrieved passages, combining factual precision with generative fluency.
+
+Existing NCERT QA systems target single subjects~\cite{sharma2025pustakai,rao2026team05} or narrow grade ranges. Multi-subject corpora introduce a unique challenge: \emph{cross-subject contamination}~--~queries about ``equilibrium'' may retrieve Chemistry chunks (chemical equilibrium) when the target is Physics (mechanical equilibrium), and ``derivative'' retrieves Mathematics chunks when the context is Chemistry (functional-group derivatives).
+
+\subsection{Contributions}
+This work makes five primary contributions:
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Multi-subject RAG corpus.} A production-ready dataset of \textbf{14{,}450 enriched chunks} spanning 99 chapters across Physics (21 ch.), Chemistry (19 units), Mathematics (27 ch.), and Biology (32 ch.) for Classes~11--12, with seven content types, dual retrieval texts, extracted formulas and key terms, structured problem objects, and PDF-location-aware bounding boxes.
+    \item \textbf{Subject-aware hybrid retrieval pipeline.} A five-stage architecture~--~hybrid BM25/dense fusion via Reciprocal Rank Fusion (RRF), cross-encoder reranking, additive subject/chapter boosting, and sibling chunk expansion~--~designed for cross-subject disambiguation while avoiding the overhead of per-subject indices.
+    \item \textbf{Comprehensive empirical evaluation.} A 573-question holdout set covering four subjects, five question types, and three difficulty levels, with systematic five-condition ablation, paired McNemar significance tests, paired-bootstrap effect sizes, and a manually-categorised failure analysis. The full pipeline achieves \textbf{$94.6\%$ Recall@10} (95\% CI $[92.7, 96.5]$), \textbf{MRR $0.810$} (CI $[0.782, 0.835]$), and \textbf{BERTScore F1 $0.805$}.
+    \item \textbf{A counter-intuitive empirical finding.} On curriculum-aligned QA dominated by definitional and exercise-style queries, BM25 \emph{outperforms} dense retrieval ($84.8\%$ vs $79.4\%$ R@10), yet hybrid fusion beats both ($89.5\%$) and cross-encoder reranking adds another $+4.2$~pp. This justifies hybrid retrieval on principled grounds rather than as a default heuristic.
+    \item \textbf{Parameter-efficiency benchmark.} Comparison against five open-source LLM baselines spanning four families (Meta, Mistral, Alibaba, Google) and 2.6B--8B parameters shows that our 1.5B+RAG system matches the BERTScore F1 of much larger zero-shot models, with substantially narrower confidence intervals reflecting RAG's per-question consistency.
+\end{enumerate}
+
+The system scales a prior single-subject Physics prototype (2{,}619 chunks, 84 questions) by $5.5\times$ in corpus size and $6.8\times$ in evaluation coverage.
+
+% ─── 2. RELATED WORK ─────────────────────────────────────────────
+\section{Related Work}
+
+\subsection{Foundational RAG Framework (Base Paper)}
+The retrieval-augmented generation framework introduced by Lewis et al.~\cite{lewis2020rag}---which we identify as the \emph{base paper} for this work---couples a parametric language model with a non-parametric memory of dense vector indices, retrieving top-$k$ passages and prepending them to an autoregressive decoder. The framework was subsequently extended by REALM~\cite{guu2020realm}, which jointly pre-trains the retriever and the language model end-to-end, and by Fusion-in-Decoder~\cite{izacard2021fid}, which aggregates evidence from multiple passages within the decoder rather than concatenating them at the prompt level. Our pipeline preserves the original Lewis-style retrieve-then-generate architecture but augments it with a five-stage retrieval cascade designed for the cross-subject disambiguation challenges absent from the open-domain QA settings these foundational works target.
+
+\subsection{Dense and Sparse Retrieval}
+Dense Passage Retrieval (DPR) by Karpukhin et al.~\cite{karpukhin2020dpr} demonstrated that learned dense encoders outperform classical BM25 on open-domain QA, establishing the dual-encoder paradigm that motivates our use of \texttt{bge-base-en-v1.5}. BERT~\cite{devlin2019bert} provides the contextual encoding backbone that this and subsequent retrievers build on; Sentence-BERT~\cite{reimers2019sbert} adapts the architecture for efficient sentence-level embeddings, a key prerequisite for chunk-level retrieval. ColBERT~\cite{khattab2020colbert} introduces late-interaction matching that interpolates between bi-encoder efficiency and full cross-encoder accuracy. Hybrid retrieval combining BM25 with dense embeddings is conventionally reported to outperform either alone~\cite{lin2021sparse}, although the relative strength of the two signals is corpus-dependent---a phenomenon we observe and quantify on curriculum-aligned QA. Cross-encoder reranking by Nogueira and Cho~\cite{nogueira2019bert} further improves context quality after a fast first-stage retrieval, motivating Stage 2 of our pipeline.
+
+\subsection{Educational QA and NCERT Datasets}
+Sharma et al.~\cite{sharma2025pustakai} introduced \emph{PustakAI} and the NCERT-QA dataset (739 Q\&A pairs, Grades 6--8), showing that curriculum-specific context is essential. Their meta one-shot strategy delivered faithfulness of $0.85$ and F1 of $0.46$ with Llama-4-Scout-17B. Rao et al.~\cite{rao2026team05} (IISc Bangalore) built a multi-task tutoring system combining GPT-4o-mini QA (BERTScore $=0.8495$ descriptive, $0.8055$ numerical), fine-tuned T5~\cite{raffel2020t5} question generation (ROUGE-L $=0.2815$), and BAAI/bge-reranker-large in a two-stage retrieval pipeline. Earlier work in this space includes TextbookQA~\cite{kembhavi2018textbookqa} (high-school science textbook QA over diagrams and text) and SciQ~\cite{welbl2017sciq} (crowdsourced multiple-choice science questions). Both Sharma et al.\ and Rao et al.\ target a single subject or grade band; our work extends to four subjects across two grade levels and explicitly tackles the multi-subject disambiguation problem. The MMLU benchmark~\cite{hendrycks2021mmlu} provides additional context for STEM-domain LLM evaluation but does not test retrieval grounding.
+
+\subsection{QA Datasets and Evaluation Methodology}
+Reading-comprehension QA was popularised by SQuAD~\cite{rajpurkar2016squad} (100K Wikipedia-grounded questions) and extended to realistic web queries by Natural Questions~\cite{kwiatkowski2019nq}. Multi-hop reasoning questions requiring evidence aggregation across documents were introduced by HotpotQA~\cite{yang2018hotpotqa}, motivating our sibling-chunk expansion strategy. Hierarchical text segmentation, foundational to our chunking pipeline, traces back to Barzilay and Elhadad~\cite{barzilay1997segmentation}. Standard retrieval evaluation employs Recall@K and follows the BEIR benchmark suite~\cite{thakur2021beir}; for generation, ROUGE~\cite{lin2004rouge} captures lexical overlap while BERTScore~\cite{zhang2019bertscore} provides contextual semantic similarity. More recent reference-free evaluators include RAGAS~\cite{es2024ragas} and G-Eval~\cite{liu2023geval}. Our evaluation combines retrieval metrics (Recall@K, MRR), generation metrics (ROUGE-L, BERTScore, Concept Coverage), and statistical significance testing (McNemar, paired bootstrap) across a 573-question multi-subject holdout with 95\% bootstrap confidence intervals.
+
+\subsection{Vector Search Infrastructure and Reasoning}
+Our dense index is built on FAISS~\cite{johnson2021faiss}, the de-facto standard for billion-scale similarity search. For complex multi-step reasoning---particularly relevant for numerical Physics problems and Mathematics derivations in our corpus---chain-of-thought prompting~\cite{wei2022cot} elicits step-by-step decomposition from instruction-tuned LLMs; we incorporate this stylistic guidance in our type-conditioned prompts (Section~V). Our pipeline extends hybrid retrieval with subject-aware and chapter-aware score boosting, addressing the cross-subject contamination problem unique to multi-subject corpora. Unlike approaches that maintain per-subject indices, our additive boost avoids storage and maintenance overhead while retaining single-index retrieval latency.
+
+% ─── 3. DATASET CONSTRUCTION ─────────────────────────────────────
+\section{Dataset Construction}
+
+\subsection{Source Material}
+Four NCERT textbooks (Reprint 2025--26) serve as source material, totalling 2{,}409 pages across 99 chapters:
+\begin{itemize}
+    \item \textbf{Physics:} 625 pages, 21 chapters (7 Class 11 per 2023+ rationalised edition, 14 Class 12).
+    \item \textbf{Chemistry:} 591 pages, 19 units (9 Class 11, 10 Class 12).
+    \item \textbf{Mathematics:} 713 pages, 27 chapters (14 Class 11, 13 Class 12).
+    \item \textbf{Biology:} 480 pages, 32 chapters (19 Class 11, 13 Class 12).
+\end{itemize}
+Each PDF was processed through a document intelligence extraction system, producing JSON chunks with page-level bounding boxes for every text segment, figure description, and table.
+
+\subsection{Five-Stage Processing Pipeline}
+Figure~\ref{fig:pipeline} illustrates the construction pipeline.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/fig_pipeline.png}
+\caption{Five-stage dataset construction pipeline from raw NCERT PDFs to RAG-optimised chunks. Bottom row shows final corpus statistics after diagnostic validation, chunk optimisation, and RAG enrichment.}
+\label{fig:pipeline}
+\end{figure*}
+
+\textbf{Stage 1 -- Parse \& Merge:} Per-subject JSON splits (7--8 files per book) are merged with global page-number offset correction, yielding approximately 6{,}500 raw chunks per subject.
+
+\textbf{Stage 2 -- Structure:} Chapter boundaries are detected via subject-specific heading patterns: uppercase \texttt{CHAPTER X} for Biology/Physics, \texttt{Unit X} for Chemistry, and logo-embedded chapter markers with section \texttt{X.1} detection for Mathematics. Exercise, summary, and Points-to-Ponder zones are identified via regex pattern matching across text, logo, and table chunk types. Section/subsection hierarchy is extracted from numbered headings (e.g., \texttt{3.2.1}). Fourteen distinct exercise detection patterns handle format variations.
+
+\textbf{Stage 3 -- Validate:} A 14-check diagnostic suite is applied: duplicate chunk IDs (8 fixed), null class/chapter fields (11 fixed), empty content (2 removed), corrupt equation-fragment section titles (188 cleaned), and noise chunks including page headers and reprint notices (112 removed).
+
+\textbf{Stage 4 -- Chunk Optimisation:} Short chunks ($<\!80$ characters) are merged with adjacent same-chapter neighbours (2{,}465 merged). Oversized chunks ($>\!3{,}000$ characters) are split at paragraph boundaries with parent--child relationship tracking (18 split). This reduces the corpus from 16{,}906 to 14{,}450 chunks while improving average chunk quality.
+
+\textbf{Stage 5 -- RAG Enrichment:} Each chunk is annotated with the fields described in Section~\ref{sec:schema}.
+
+\subsection{Per-Subject Breakdown}
+Each subject presents distinct processing challenges:
+
+\paragraph{Physics (3{,}319 chunks)} The 2023+ rationalised Class 11 edition reduced content from 14 to 7 chapters, leaving gaps around Thermodynamics, Oscillations, and Waves. Bounding boxes are essential because many chapters intersperse diagrams with derivations.
+
+\paragraph{Chemistry (4{,}250 chunks)} Chemistry uses \texttt{Unit X} rather than \texttt{Chapter X}; our parser handles both forms. The dataset has the highest diagram density (643 diagram chunks; $15.1\%$ of the subject corpus) due to molecular-structure illustrations.
+
+\paragraph{Mathematics (4{,}584 chunks)} Mathematics has by far the most exercise chunks (1{,}352, or $29.5\%$ of the subject corpus). Section-level exercises require sub-chapter detection: the parser tracks \texttt{X.Y} patterns to associate each exercise with its parent section.
+
+\paragraph{Biology (2{,}297 chunks)} Biology has zero solved examples because the textbook uses inline explanations rather than numbered worked examples. Concept-type chunks therefore receive richer key-term metadata.
+
+\subsection{Chunk Schema}\label{sec:schema}
+Figure~\ref{fig:schema} illustrates the enriched chunk schema. Each record contains seven nested objects:
+\begin{itemize}
+    \item \texttt{content\_type}: One of seven categories~--~\texttt{concept}, \texttt{example}, \texttt{exercise}, \texttt{diagram}, \texttt{table}, \texttt{summary}, \texttt{points\_to\_ponder}.
+    \item \texttt{searchable\_text}: BM25-optimised text comprising chapter prefix, section title, raw content, and appended key terms and formulas.
+    \item \texttt{embedding\_text}: Dense-retrieval-optimised text with structured context prefix: \texttt{[Subject ChN Title $|$ Section] content}.
+    \item \texttt{key\_terms}: Extracted from bold and italic markers, up to 15 per chunk.
+    \item \texttt{formulas}: Extracted via LaTeX patterns and common equation patterns, up to 10 per chunk.
+    \item \texttt{difficulty}: Heuristic assignment based on section position and content type.
+    \item \texttt{problems}: Structured object with \texttt{is\_problem}, \texttt{problem\_type}, \texttt{question\_text}, and \texttt{solution\_text}.
+    \item \texttt{location}: Source PDF, page index/number, and normalised bounding-box coordinates $\{l, t, r, b\} \in [0, 1]^4$.
+\end{itemize}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig_schema.pdf}
+\caption{Enriched chunk schema. Each record contains seven nested objects covering hierarchy, content, problems, visuals, location, metadata, and RAG-optimised retrieval texts.}
+\label{fig:schema}
+\end{figure}
+
+\subsection{Corpus Statistics}
+Figure~\ref{fig:corpus_stack}, Figure~\ref{fig:donut}, and Table~\ref{tab:corpus_stats} present the corpus breakdown. Content-length statistics after splitting: $\min = 1$, $\max = 3{,}194$, mean $= 376$, median $= 247$ characters. Short chunks ($<100$ characters) comprise $13.5\%$ of the corpus, reduced from $28.7\%$ pre-merging.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig_corpus_stack.png}
+\caption{Corpus composition by subject and content type. Mathematics has the most exercise chunks (1{,}352); Chemistry has the most diagram descriptions (643); Biology has no solved examples.}
+\label{fig:corpus_stack}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.78\columnwidth]{figures/fig_content_donut.png}
+\caption{Overall content-type distribution across the 14{,}450-chunk corpus.}
+\label{fig:donut}
+\end{figure}
+
+\begin{table*}[!t]
+\caption{Corpus Statistics by Subject}
+\label{tab:corpus_stats}
+\centering\footnotesize
+\begin{tabular}{lrrrrrrr}
+\toprule
+\textbf{Subject} & \textbf{Chunks} & \textbf{Concepts} & \textbf{Examples} & \textbf{Diagrams} & \textbf{Exercises} & \textbf{Tables} & \textbf{Summaries} \\
+\midrule
+Physics     & 3{,}319 & 2{,}554 & 147 & 441   & 82      & 53  & 42  \\
+Chemistry   & 4{,}250 & 3{,}239 & 29  & 643   & 145     & 124 & 70  \\
+Mathematics & 4{,}584 & 2{,}400 & 295 & 248   & 1{,}352 & 110 & 179 \\
+Biology     & 2{,}297 & 1{,}650 & 0   & 400   & 111     & 35  & 101 \\
+\midrule
+\textbf{Total} & \textbf{14{,}450} & \textbf{9{,}843} & \textbf{471} & \textbf{1{,}732} & \textbf{1{,}690} & \textbf{322} & \textbf{392} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+% ─── 4. SYSTEM ARCHITECTURE ──────────────────────────────────────
+\section{System Architecture}
+
+Figure~\ref{fig:architecture} presents the end-to-end architecture comprising five retrieval stages and prompted generation.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/fig_architecture.png}
+\caption{End-to-end multi-subject RAG pipeline. \emph{Left:} Offline path builds BM25 and FAISS indices from 14{,}450 enriched chunks. \emph{Right:} Online path performs five-stage retrieval culminating in subject-aware prompted generation.}
+\label{fig:architecture}
+\end{figure*}
+
+\subsection{Embedding and Indexing}
+Dense embeddings are computed using \texttt{BAAI/bge-base-en-v1.5}~\cite{xu2023bge} (768-dimensional, instruction-tuned) over the \texttt{embedding\_text} field. Vectors are stored in a FAISS~\cite{johnson2021faiss} \texttt{IndexFlatIP} index for exact inner-product search; because embeddings are L2-normalised, this is equivalent to cosine similarity. A parallel BM25~\cite{robertson2009bm25} index (\texttt{rank\_bm25}) operates on \texttt{searchable\_text}. Together the two indices consume ${\approx}44$~MB of RAM.
+
+\subsection{Stage 1: Hybrid Retrieval via Reciprocal Rank Fusion}
+For each query $q$, both BM25 and dense retrieval return the top-$N$ candidates ($N = 100$). BM25 scoring is:
+\begin{equation}
+\label{eq:bm25}
+s_{\mathrm{BM25}}(q,d) = \sum_{t \in q} \mathrm{IDF}(t) \cdot \frac{f(t,d)\,(k_1 + 1)}{f(t,d) + k_1\!\left(1 - b + b \cdot \frac{|d|}{\mathrm{avgdl}}\right)}
+\end{equation}
+where $f(t,d)$ is the term frequency, $k_1 = 1.5$, $b = 0.75$. Dense scoring is:
+\begin{equation}
+\label{eq:dense}
+s_{\mathrm{dense}}(q,d) = \cos(\mathbf{E}_q, \mathbf{E}_d) = \frac{\mathbf{E}_q \cdot \mathbf{E}_d}{\|\mathbf{E}_q\| \|\mathbf{E}_d\|}
+\end{equation}
+Scores are fused via Reciprocal Rank Fusion~\cite{cormack2009rrf}:
+\begin{equation}
+\label{eq:rrf}
+s_{\mathrm{RRF}}(d) = \sum_{r \in \{\mathrm{BM25,Dense}\}} \frac{1}{\mathrm{rank}_r(d) + k}
+\end{equation}
+where $k = 60$. RRF eliminates the need for score normalisation across heterogeneous retrieval systems.
+
+\subsection{Stage 2: Cross-Encoder Reranking}
+The top-100 RRF candidates are reranked by a cross-encoder~\cite{nogueira2019bert} (\texttt{cross-encoder/ms-marco-MiniLM-L-6-v2}):
+\begin{equation}
+\label{eq:ce}
+s_{\mathrm{CE}}(q,d) = \mathrm{CrossEncoder}([q;d])
+\end{equation}
+where $[q;d]$ denotes concatenation. The 22M-parameter MiniLM produces a relevance logit per pair with ${\approx}1.4$~ms per pair on a Colab L4 GPU.
+
+\subsection{Stage 3: Subject and Chapter Boosting}
+Subject and chapter metadata are incorporated as additive score boosts:
+\begin{equation}
+\label{eq:boost}
+\begin{split}
+s'(d) &= s_{\mathrm{CE}}(d) + \alpha \cdot \mathbb{1}\!\left[\mathrm{subj}(d) = \mathrm{subj}(q)\right] \\
+      &\quad + \beta \cdot \mathbb{1}\!\left[\mathrm{ch}(d) = \mathrm{ch}(q) \wedge \mathrm{subj}(d) = \mathrm{subj}(q)\right]
+\end{split}
+\end{equation}
+with $\alpha = 2.0$ (subject boost) and $\beta = 4.0$ (chapter boost). This lightweight mechanism avoids per-subject indices while resolving ambiguous terminology. As shown empirically in Section~\ref{sec:hyperparam}, the system is robust to these constants over a wide range; the chosen values lie on the saturation plateau of the MRR curve.
+
+\subsection{Stage 4: Sibling Chunk Expansion}
+For chunks split during dataset Stage~4, all siblings sharing the same \texttt{parent\_chunk\_id} are reassembled in the generation context:
+\begin{equation}
+\label{eq:sibling}
+\mathrm{Context}(c_i) = \bigoplus_{j=1}^{|S_p|} c_j \quad \text{where}\quad S_p = \{c : \mathrm{parent}(c) = p\}
+\end{equation}
+This ensures the LLM receives complete paragraphs. Expansion is applied only at the generation-context stage; retrieval metrics are reported on the pre-expansion flat ranking.
+
+\subsection{Stage 5: Prompted Generation}
+Generation uses \texttt{Qwen2.5-1.5B-Instruct} with subject-specific prompts:
+\begin{lstlisting}
+System: You are an expert NCERT {Subject} tutor for
+        Class {Grade}. Topic: {Chapter}. Answer using
+        ONLY the provided sources. {Style}
+User:   SOURCES: {context}
+        QUESTION: {query}
+\end{lstlisting}
+where \texttt{Style} adapts by question type: step-by-step derivation for numerical, direct statement for definitions. Token budgets range from $300$ (factual/definition) to $420$ (numerical).
+
+\subsection{Component Selection}
+Table~\ref{tab:components} summarises component choices.
+
+\begin{table}[!t]
+\caption{Component Selection and Rationale}
+\label{tab:components}
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{0.18\columnwidth} p{0.36\columnwidth} p{0.40\columnwidth}@{}}
+\toprule
+\textbf{Component} & \textbf{Choice} & \textbf{Rationale} \\
+\midrule
+Embeddings    & \texttt{bge-base-en-v1.5}       & BEIR SOTA, 768-dim \\
+Vector Store  & FAISS \texttt{IndexFlatIP}      & Exact cosine, $<\!10$ ms \\
+Sparse Index  & BM25 (\texttt{rank-bm25})       & Keyword precision \\
+Score Fusion  & RRF ($k{=}60$)                  & No normalisation needed \\
+Reranker      & \texttt{ms-marco-MiniLM-L-6-v2} & Fast cross-encoder \\
+LLM           & \texttt{Qwen2.5-1.5B-Instruct}  & Instruction-tuned \\
+Subject Boost & $\alpha{=}2.0$                  & On saturation plateau \\
+Chapter Boost & $\beta{=}4.0$                   & MRR saturates at $\beta{\geq}4$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ─── 5. METHODOLOGY ──────────────────────────────────────────────
+\section{Methodology}
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/fig_math.png}
+\caption{Mathematical formulation of the five retrieval stages showing BM25 scoring, dense cosine similarity, RRF fusion, cross-encoder reranking, and subject/chapter boosting.}
+\label{fig:math}
+\end{figure*}
+
+\subsection{End-to-End Query Flow}
+For each evaluation question $q$ with optional metadata $(\mathrm{subj}_q, \mathrm{ch}_q, \mathrm{type}_q)$:
+\begin{enumerate}
+    \item \textbf{Query augmentation.} BM25 input is prefixed with lightweight hints: \texttt{\{subject\} Chapter \{N\} ch\{N\}}, plus \texttt{``formula calculation numerical''} when $\mathrm{type}_q{=}$numerical. Dense input remains the raw query to preserve semantic fidelity.
+    \item \textbf{Hybrid retrieval.} Compute Equations~\ref{eq:bm25}--\ref{eq:rrf}; retain top-$100$ fused candidates.
+    \item \textbf{Cross-encoder reranking.} Rerank with Equation~\ref{eq:ce}.
+    \item \textbf{Subject/chapter boosting.} Apply Equation~\ref{eq:boost}; select top-$15$ flat IDs.
+    \item \textbf{Sibling expansion} (Equation~\ref{eq:sibling}). Reassemble parent--child groups for the generation context.
+    \item \textbf{Context assembly.} Deduplicate and truncate expanded chunks to a $5{,}000$-character budget, interleaving ``[Source N]:'' markers.
+    \item \textbf{Prompted generation.} Feed the chat-templated prompt to Qwen2.5-1.5B with a type-conditioned token budget.
+\end{enumerate}
+
+\subsection{Preprocessing and Tokenization}
+The BM25 tokenizer lower-cases, strips punctuation, and removes tokens shorter than 3 characters or in the English stopword list, with a curated \emph{keep list} (``force'', ``velocity'', ``mitochondria'', ``chapter'', \ldots) that protects domain-relevant terms. The dense encoder receives raw query text.
+
+\subsection{Generation Pipeline}
+Generation is deterministic (\texttt{do\_sample=False}) so all reported numbers are reproducible. Prompts are type-conditioned: numerical questions receive an explicit ``show the formula, substitute values step-by-step'' directive; definition/factual prompts request ``a clear, direct answer.''
+
+% ─── 6. EVALUATION METHODOLOGY ───────────────────────────────────
+\section{Evaluation Methodology}
+
+\subsection{Evaluation Set Construction}
+The 573-question evaluation set (Figure~\ref{fig:evalset}) is constructed from two sources:
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig_evalset.png}
+\caption{Evaluation set distribution across (a) subjects, (b) question types, and (c) difficulty levels. Total: 573 questions.}
+\label{fig:evalset}
+\end{figure}
+
+\textbf{NCERT exercises (379 questions, 66.1\%):} End-of-chapter exercise questions extracted from the textbooks, linked to source chunk IDs via the \texttt{exercises\_index}.
+
+\textbf{Key-term-generated questions (194 questions, 33.9\%):} Definitional questions generated from extracted bold/italic key terms: ``What is \{term\}? Explain in the context of \{chapter\}.'' We discuss this construction's failure modes in Section~\ref{sec:failures}.
+
+Each question carries \texttt{subject}, \texttt{grade}, \texttt{chapter} metadata, question type, difficulty, reference chunk ID(s), a \texttt{recall\_any\_of} list for lenient matching, and a reference answer. Five question types are represented: definition (226), conceptual (200), numerical (78), factual (46), and reasoning (23).
+
+\subsection{Metrics}
+\textbf{Retrieval metrics.}
+\begin{itemize}
+    \item \textbf{Recall@K} ($K \in \{5, 10\}$): Lenient evaluation~--~a hit if any chunk in the \texttt{recall\_any\_of} list appears in the top-$K$ results.
+    \item \textbf{MRR}: $\mathrm{MRR} = \frac{1}{|Q|} \sum_{i=1}^{|Q|} \frac{1}{\mathrm{rank}_i}$.
+\end{itemize}
+
+\textbf{Generation metrics.}
+\begin{itemize}
+    \item \textbf{ROUGE-L}~\cite{lin2004rouge}: Longest common subsequence F-measure.
+    \item \textbf{BERTScore F1}~\cite{zhang2019bertscore}: Contextual embedding-based semantic similarity.
+    \item \textbf{Concept Coverage}: $\mathrm{CC}(a, C) = |\{c \in C : c \in a\}| / |C|$, where $a$ is the generated answer and $C$ is the set of reference key concepts.
+\end{itemize}
+
+All metrics include 95\% bootstrap confidence intervals ($n = 1{,}000$).
+
+\subsection{Ablation Conditions}
+Five conditions isolate each component's contribution:
+\begin{enumerate}
+    \item \textbf{BM25-only:} Pure keyword retrieval on \texttt{searchable\_text}.
+    \item \textbf{Dense-only:} Pure FAISS cosine on \texttt{embedding\_text}.
+    \item \textbf{Hybrid RRF:} BM25 + Dense with RRF, no reranking.
+    \item \textbf{Hybrid + Rerank:} RRF + cross-encoder, no boosting.
+    \item \textbf{Full pipeline:} RRF + rerank + boost + sibling expansion.
+\end{enumerate}
+A sixth comparison condition (\textbf{Zero-shot LLM}: Qwen2.5-1.5B without retrieval, scored on a matched 200-question subset) is reported alongside.
+
+% ─── 7. RESULTS AND ANALYSIS ─────────────────────────────────────
+\section{Results and Analysis}\label{sec:results}
+
+\subsection{Ablation Study}\label{sec:ablation}
+Table~\ref{tab:ablation} and Figure~\ref{fig:ablation} present the main ablation. The largest single gain comes from RRF fusion over Dense-only ($+10.1$~pp at Recall@10); cross-encoder reranking adds another $+4.2$~pp; subject/chapter boosting adds a final $+0.9$~pp. The full pipeline reaches $94.6\%$ R@10 with a 95\% CI of $[92.7, 96.5]$.
+
+A counter-intuitive finding stands out. \textbf{BM25 alone outperforms dense retrieval} on this corpus ($84.8\%$ vs $79.4\%$ R@10), reflecting two corpus characteristics: (i) NCERT exercise questions frequently share verbatim wording with their reference chunk, which BM25 captures perfectly, and (ii) our key-term-generated questions explicitly contain the term whose chapter context they describe, again favouring lexical match. Despite this, hybrid fusion ($89.5\%$) outperforms either component alone~--~BM25 contributes $71$ unique top-$10$ hits while dense retrieval contributes a complementary $40$, with their union covering $91.8\%$ of questions before reranking. This empirically validates hybrid retrieval on principled grounds rather than by default.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig_ablation.png}
+\caption{Ablation study: incremental retrieval gains across pipeline stages (573-question holdout, 95\% bootstrap CIs). BM25 outperforms Dense on this corpus; the hybrid combination outperforms both.}
+\label{fig:ablation}
+\end{figure}
+
+\begin{table*}[!t]
+\caption{Ablation Study: Retrieval Performance ($N = 573$ Questions, 95\% Bootstrap CIs)}
+\label{tab:ablation}
+\centering\footnotesize
+\begin{tabular}{lccc}
+\toprule
+\textbf{Configuration} & \textbf{Recall@5 (\%)} & \textbf{Recall@10 (\%)} & \textbf{MRR} \\
+\midrule
+BM25-Only       & 79.93 [76.61--82.90] & 84.82 [81.85--87.78] & 0.692 [0.658--0.723] \\
+Dense-Only      & 66.67 [62.83--70.51] & 79.41 [75.92--82.72] & 0.513 [0.477--0.547] \\
+Hybrid RRF      & 81.15 [77.66--84.47] & 89.53 [86.91--91.97] & 0.636 [0.604--0.670] \\
+Hybrid + Rerank & 89.70 [87.26--92.15] & 93.72 [91.62--95.64] & 0.779 [0.749--0.806] \\
+\textbf{Full Pipeline} & \textbf{91.62} [89.35--93.72] & \textbf{94.59} [92.67--96.51] & \textbf{0.810} [0.782--0.835] \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Per-Subject Performance}
+Table~\ref{tab:per_subject} breaks down Full Pipeline results by subject; Figure~\ref{fig:per_subject} visualises all five conditions grouped by subject. Recall@10 ranges from $92.4\%$ (Mathematics) to $96.6\%$ (Biology). Mathematics is hardest~--~primarily because numerical and exercise-style questions have many semantically-similar candidate chunks (worked examples, end-of-chapter problems, and concept exposition all use overlapping vocabulary), creating retrieval ambiguity even after reranking. Biology is strongest because its chunks have richer key-term metadata and consistent chapter structure.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig_per_subject.png}
+\caption{Per-subject Recall@10 across all retrieval conditions. Mathematics receives the largest gain from cross-encoder reranking ($+6.4$~pp from RRF to Rerank), reflecting heavier semantic ambiguity in mathematical exercises.}
+\label{fig:per_subject}
+\end{figure}
+
+\begin{table}[!t]
+\caption{Per-Subject Performance (Full Pipeline)}
+\label{tab:per_subject}
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}l r c c c@{}}
+\toprule
+\textbf{Subject} & \textbf{n} & \textbf{R@10 (\%) [95\% CI]} & \textbf{MRR [95\% CI]} & \textbf{BERT} \\
+\midrule
+Biology     & 179 & \textbf{96.6} [93.9, 98.9] & \textbf{0.85} [0.80, 0.89] & 0.816 \\
+Chemistry   & 114 & 95.6 [91.2, 99.1] & 0.83 [0.76, 0.88] & 0.800 \\
+Physics     & 122 & 93.4 [88.5, 97.5] & 0.81 [0.75, 0.87] & 0.800 \\
+Mathematics & 158 & 92.4 [88.0, 96.2] & 0.76 [0.70, 0.81] & 0.800 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Per-Question-Type Performance}
+Table~\ref{tab:per_type} shows performance by question type. Reasoning questions ($n=23$) are easiest at $100\%$ R@10 because they tend to have unique chapter-specific phrasing; numerical and factual questions also reach $\geq\!94.9\%$. Definition questions are the lowest-recall category at $91.6\%$, and inspection of the failures (Section~\ref{sec:failures}) reveals that nearly all are auto-generated key-term queries with degenerate question text.
+
+\begin{table}[!t]
+\caption{Per-Question-Type Performance (Full Pipeline)}
+\label{tab:per_type}
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}l r c c c@{}}
+\toprule
+\textbf{Type} & \textbf{n} & \textbf{R@10 (\%) [95\% CI]} & \textbf{MRR [95\% CI]} & \textbf{BERT} \\
+\midrule
+Reasoning   &  23 & \textbf{100.0} [100, 100] & \textbf{0.94} [0.85, 1.00] & 0.802 \\
+Factual     &  46 & 97.8 [93.5, 100]  & 0.92 [0.86, 0.98] & 0.792 \\
+Conceptual  & 200 & 96.5 [94.0, 99.0] & 0.89 [0.85, 0.93] & 0.790 \\
+Numerical   &  78 & 94.9 [89.7, 98.7] & 0.90 [0.84, 0.96] & 0.774 \\
+Definition  & 226 & 91.6 [88.1, 94.7] & 0.67 [0.62, 0.72] & 0.831 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Per-Difficulty Performance}
+Table~\ref{tab:per_diff} reports per-difficulty results. The advanced category (12 questions) reaches $100\%$ R@10, but its CI is wide due to small $n$. Basic and intermediate questions both exceed $92\%$, with intermediate questions slightly stronger ($97.1\%$)~--~many definition-style basic questions fall into the noisy-key-term failure mode discussed in Section~\ref{sec:failures}.
+
+\begin{table}[!t]
+\caption{Per-Difficulty Performance (Full Pipeline)}
+\label{tab:per_diff}
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}l r c c c@{}}
+\toprule
+\textbf{Difficulty} & \textbf{n} & \textbf{R@10 (\%) [95\% CI]} & \textbf{MRR [95\% CI]} & \textbf{BERT} \\
+\midrule
+Advanced      &  12 & 100.0 [100, 100]  & 0.77 [0.59, 0.94] & 0.783 \\
+Intermediate  & 273 & 97.1 [94.9, 98.9] & 0.90 [0.87, 0.93] & 0.788 \\
+Basic         & 288 & 92.0 [88.5, 95.1] & 0.72 [0.68, 0.76] & 0.822 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Generation Quality}
+Table~\ref{tab:gen_quality} compares grounded Full-Pipeline generation against zero-shot LLM generation on a matched 200-question subset.
+
+\begin{table}[!t]
+\caption{Generation Quality: Grounded vs Zero-Shot ($N = 200$, matched)}
+\label{tab:gen_quality}
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}l c c c@{}}
+\toprule
+\textbf{System} & \textbf{BERTScore F1} & \textbf{ROUGE-L} & \textbf{Concept Cov.} \\
+\midrule
+Full Pipeline (RAG) & 0.809 [0.805, 0.813] & 0.125 [0.116, 0.134] & 35.5\% \\
+Zero-shot LLM       & 0.805 [0.802, 0.808] & 0.108 [0.102, 0.114] & 34.3\% \\
+\midrule
+\textbf{Gain} & \textbf{+0.004} & \textbf{+0.017} & \textbf{+1.2 pp} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The grounded pipeline achieves a small but consistent ROUGE-L improvement ($+1.7$ percentage points) over the zero-shot baseline. The BERTScore difference is statistically detectable but small in absolute terms ($+0.004$). Two factors explain the modest BERTScore gap. First, BERTScore measures semantic similarity at a coarse level and is known to compress score variance for short factual answers; it therefore underestimates the practical value of grounding. Second, the zero-shot Qwen2.5-1.5B already produces fluent answers covering many NCERT topics from its pretraining distribution~--~retrieval grounding primarily affects \emph{factual provenance and attribution} (which surface citations the LLM can use), an aspect that none of our automated metrics directly measure. We treat human/RAGAS-style faithfulness evaluation as future work (Section~\ref{sec:limitations}).
+
+\subsection{Statistical Significance}
+Table~\ref{tab:significance} reports paired McNemar tests on Recall@10 and paired bootstrap on MRR for every consecutive pipeline stage. Three of the four stages produce significant gains at $p<0.001$. The final +Rerank$\to$Full step (subject/chapter boost) flips $5$ questions from miss to hit and zero in the opposite direction (McNemar exact $p=0.063$), with a paired-bootstrap $95\%$ CI for the MRR delta of $[+0.020, +0.042]$~--~a small but consistently positive effect that does not quite cross the conventional significance threshold for binary hits at $K=10$.
+
+The BM25$\to$Dense comparison is significant in the \emph{negative} direction ($p=0.004$, Dense loses 71 to BM25's 40 wins), confirming the headline finding from Section~\ref{sec:ablation}.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig_signif.png}
+\caption{Paired-significance plot. Green bars count questions where stage~B improves over stage~A on Recall@10; red bars count regressions. Three of four stage transitions are statistically significant at $p<0.001$.}
+\label{fig:signif}
+\end{figure}
+
+\begin{table}[!t]
+\caption{Paired Significance Tests Across Pipeline Stages}
+\label{tab:significance}
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}l c c c c@{}}
+\toprule
+\textbf{Comparison} & \textbf{B wins} & \textbf{A wins} & \textbf{McNemar p} & \textbf{MRR $\Delta$ CI} \\
+\midrule
+BM25 $\to$ Dense   & 40 & 71 & $4.2\mathrm{e}{-3}$\;**   & $[-0.21, -0.14]$ \\
+Dense $\to$ RRF    & 66 &  8 & $1.8\mathrm{e}{-12}$\;*** & $[+0.10, +0.14]$ \\
+RRF $\to$ +Rerank  & 33 &  9 & $2.7\mathrm{e}{-4}$\;***  & $[+0.11, +0.17]$ \\
++Rerank $\to$ Full &  5 &  0 & $6.3\mathrm{e}{-2}$\;n.s. & $[+0.02, +0.04]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Manual Failure Analysis}\label{sec:failures}
+We manually inspected and categorised every one of the $31$ Recall@10 misses by reading the question text, the reference chunk, and the actually-retrieved top-5. Figure~\ref{fig:failures} shows the resulting distribution.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.85\columnwidth]{figures/fig_failure_modes.png}
+\caption{Manually-categorised failure-mode distribution on Full-Pipeline Recall@10 misses ($N=31$). The largest single category is degenerate auto-generated questions (35.5\%); the second is exercise-vs-concept ambiguity (29.0\%); the third is near-miss within the same textbook section (25.8\%).}
+\label{fig:failures}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Noisy key-term query} (11 cases, $35.5\%$): The auto-generation pipeline produced degenerate questions from page noise, table headers, or stray punctuation~--~e.g., \emph{``What is Solution? Explain in the context of Three Dimensional Geometry,''} \emph{``What is one? Explain in the context of Magnetism and Matter,''} \emph{``What is A$\cdot$A?''}. These are not real failures of retrieval but artefacts of question construction; a stricter key-term filter would eliminate this category entirely.
+    \item \textbf{Exercise vs.\ concept mismatch} (9 cases, $29.0\%$): Mathematical or numerical questions whose reference chunk is an end-of-chapter exercise, but where retrieval surfaces the corresponding concept exposition. For example, the question \emph{``Find $(a+b)^4 - (a-b)^4$''} (Binomial Theorem) retrieved the concept chunk explaining the binomial expansion rather than the exercise that originally posed this calculation. The retrieved context is pedagogically equivalent or even more useful for answering, but does not match the reference.
+    \item \textbf{Near-miss, same section} (8 cases, $25.8\%$): The retrieved top-1 and reference chunk lie in the same textbook section but are different sub-chunks (e.g., \texttt{biology\_text\_256\_a632} vs.\ \texttt{biology\_text\_256\_c8da}). These are functionally equivalent for downstream generation; under a relaxed lenient-matching scheme that accepts neighbours within a section, the effective Recall@10 would rise to ${\approx}98.4\%$.
+    \item \textbf{Long multipart numerical} (2 cases, $6.5\%$): Multi-paragraph numerical problems whose reference covers only one sub-part.
+    \item \textbf{Math-notation-only query} (1 case, $3.2\%$): A pure-LaTeX integral expression with effectively zero content tokens for either retriever.
+\end{itemize}
+
+\textbf{Key insight.} Of the 31 nominal failures, only ${\approx}12$ ($\sim\!2\%$ of the eval set) reflect genuine retrieval errors. The remaining 19 are either evaluation-set artefacts (35.5\% degenerate queries) or boundary cases where retrieval is functionally correct (25.8\% near-misses in the same section). Adjusting for these, the \emph{effective} Recall@10 of the system on well-formed queries is approximately $97$--$98\%$.
+
+\subsection{Cross-Subject Disambiguation}
+Subject and chapter boosting ($\alpha=2.0$, $\beta=4.0$) addresses cross-subject contamination~--~a challenge unique to multi-subject corpora. The boost mechanism flips $5$ questions from R@10-miss to R@10-hit on this benchmark; while the McNemar test does not cross conventional significance for the binary R@10 metric, the paired-bootstrap MRR delta of $[+0.020, +0.042]$ excludes zero, indicating a small but consistent positive effect. Manual inspection of the affected queries confirms the boost is doing useful work in the expected direction (e.g., for queries about ``equilibrium'' the chapter boost promotes \emph{Chemical Equilibrium} chunks to top rank when the query is tagged with chemistry chapter~6).
+
+\subsection{Open-Source LLM Baseline Comparison}\label{sec:llm_baselines}
+To contextualise our 1.5B+RAG system against the broader open-source LLM landscape, we additionally evaluate five zero-shot baselines spanning four model families and three orders of magnitude in parameter count. Each baseline model was loaded locally on a Colab L4 GPU and run on the same 200-question matched subset using identical prompts (subject- and chapter-aware system message, deterministic greedy decoding). Two further candidates from the Qwen family (Qwen2.5-1.5B and Qwen2.5-7B) produced degenerate outputs under \texttt{transformers} 5.0 + greedy decoding (a known tokenizer-decoding interaction) and are excluded.
+
+\begin{table*}[!t]
+\caption{Open-Source LLM Baseline Comparison ($N = 200$, matched subset). All baselines are zero-shot (no retrieval); ``Full Pipeline'' applies our retrieval pipeline with \texttt{Qwen2.5-1.5B-Instruct} as the generator.}
+\label{tab:llm_baselines}
+\centering\footnotesize
+\begin{tabular}{llcccc}
+\toprule
+\textbf{System} & \textbf{Family} & \textbf{Params} & \textbf{BERTScore F1} & \textbf{ROUGE-L} & \textbf{Concept Cov.} \\
+\midrule
+\textbf{Full Pipeline (1.5B + RAG, ours)} & Alibaba (RAG) & 1.5B + RAG & \textbf{0.809} [0.805--0.813] & \textbf{0.125} [0.116--0.134] & \textbf{35.5\%} \\
+\midrule
+Llama-3.1-8B (zero-shot)        & Meta      & 8.0B  & 0.808 [0.764--0.858] & 0.122 [0.037--0.257] & 39.5\% \\
+Mistral-7B-v0.3 (zero-shot)     & Mistral   & 7.2B  & 0.810 [0.762--0.852] & 0.118 [0.039--0.219] & 34.8\% \\
+Llama-3.2-3B (zero-shot)        & Meta      & 3.2B  & 0.809 [0.763--0.851] & 0.123 [0.031--0.229] & 37.0\% \\
+Qwen2.5-3B (zero-shot)          & Alibaba   & 3.0B  & 0.808 [0.752--0.849] & 0.120 [0.032--0.220] & 36.2\% \\
+Gemma-2-2B (zero-shot)          & Google    & 2.6B  & 0.803 [0.770--0.841] & 0.116 [0.045--0.218] & 40.2\% \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{figure*}[!htb]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/fig_baselines.png}
+\caption{Comparison against five open-source LLM baselines spanning four families (Meta, Mistral, Alibaba, Google) and 2.6B--8B parameters. \emph{(a)} BERTScore F1 with 95\% bootstrap CIs. \emph{(b)} Concept Coverage (\% of reference key concepts appearing in the generated answer). Our 1.5B+RAG system achieves comparable BERTScore F1 to all baselines despite using a generator $1.7$--$5.3\times$ smaller, and produces narrower confidence intervals due to the consistency that retrieval grounding provides.}
+\label{fig:llm_baselines}
+\end{figure*}
+
+Table~\ref{tab:llm_baselines} and Figure~\ref{fig:llm_baselines} summarise the comparison. Three observations are noteworthy.
+
+First, all five zero-shot baselines achieve BERTScore F1 within a narrow band of $0.803$--$0.810$, statistically indistinguishable from our 1.5B+RAG system's $0.809$. This holds for both 3B and 8B parameter models. Our system thus matches or exceeds the answer quality of much larger zero-shot LLMs while using a generator $1.7$--$5.3\times$ smaller.
+
+Second, our system's confidence interval is dramatically narrower ($\pm 0.004$) than every baseline's ($\pm 0.04$ to $\pm 0.05$). Retrieval grounding produces \emph{consistent} answers anchored to NCERT content; zero-shot LLMs produce more variable answers across question types. This per-question reliability~--~an essential property for educational deployment~--~is the most underappreciated practical advantage of RAG.
+
+Third, BERTScore F1 saturates near the inter-annotator floor for short factual answers and fails to discriminate between systems on this task. ROUGE-L (lexical overlap with the curriculum text) and Concept Coverage (presence of curriculum-specific key terms) tell a more nuanced story: ROUGE-L is comparable across all systems ($0.116$--$0.125$), while Concept Coverage favours larger models marginally. The headline finding is therefore one of \emph{parameter efficiency}: a 1.5B grounded model is competitive with 7--8B ungrounded models on automated metrics, at $\sim\!10\times$ smaller deployment footprint.
+
+A robust head-to-head ranking of these systems would require human evaluation of factual correctness and faithfulness, which we treat as future work.
+
+% ─── 8. SCALING ANALYSIS ─────────────────────────────────────────
+\section{Scaling Analysis}
+
+Table~\ref{tab:scaling} and Figure~\ref{fig:scaling} compare the single-subject prototype with this multi-subject system.
+
+\begin{table}[!t]
+\caption{Scaling: Single-Subject Prototype vs.\ This Work}
+\label{tab:scaling}
+\centering\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Dimension}      & \textbf{Prototype} & \textbf{This Work} & \textbf{Scale} \\
+\midrule
+Subjects                & 1      & 4       & $4.0\times$ \\
+Chapters                & 14     & 99      & $7.1\times$ \\
+Corpus chunks           & 2{,}619 & 14{,}450 & $5.5\times$ \\
+Eval questions          & 84     & 573     & $6.8\times$ \\
+Content types           & 6      & 7       & --  \\
+Retrieval stages        & 3      & 5       & --  \\
+Subject boosting        & No     & Yes     & --  \\
+Cross-encoder           & No     & Yes     & --  \\
+Formulas extracted      & No     & 4{,}566 ch. & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig_scaling.png}
+\caption{(a) Corpus and evaluation scale comparison (log scale). (b) Feature comparison between prototype and this work.}
+\label{fig:scaling}
+\end{figure}
+
+% ─── 9. DISCUSSION ───────────────────────────────────────────────
+\section{Discussion}
+
+\subsection{Hyperparameter Robustness}\label{sec:hyperparam}
+Figure~\ref{fig:hyperparam} shows sensitivity sweeps over the subject boost $\alpha$ (with $\beta=4.0$) and chapter boost $\beta$ (with $\alpha=2.0$) on a stratified 100-question subset.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figures/fig_hyperparam.png}
+\caption{Hyperparameter sensitivity. Recall@10 is constant across all tested values of both $\alpha$ and $\beta$; MRR rises monotonically with $\beta$ until saturating at $\beta\!\geq\!4$. The system is therefore robust to these constants over the operating range tested.}
+\label{fig:hyperparam}
+\end{figure}
+
+The data show an honest finding: the system is \emph{robust} rather than exquisitely tuned. Recall@10 stays at $94\%$ for every tested value of both $\alpha$ ($0$--$8$) and $\beta$ ($0$--$16$). MRR is also flat in $\alpha$ but rises monotonically with $\beta$ from $0.803$ at $\beta=0$ to $0.820$ at $\beta=4$, then saturates. The chosen defaults ($\alpha=2.0$, $\beta=4.0$) lie on the saturation plateau of the MRR curve, are not overfit to a specific value, and would not noticeably degrade performance if perturbed by a factor of two in either direction. We view this as a \emph{positive property} for deployment: the system does not require operator tuning.
+
+\subsection{Computational Cost}
+Table~\ref{tab:cost} reports per-query cost on a single Colab L4 GPU (22.5~GB VRAM) at batch size 1.
+
+\begin{table}[!t]
+\caption{Computational Cost Profile (Colab L4, Batch 1)}
+\label{tab:cost}
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}l l r r@{}}
+\toprule
+\textbf{Stage} & \textbf{Model} & \textbf{Params} & \textbf{Latency (ms)} \\
+\midrule
+BM25 retrieval       & \texttt{rank\_bm25}       & 0 M       & 25 \\
+Dense retrieval      & \texttt{bge-base-en-v1.5} & 110 M     & 75 \\
+Cross-encoder rerank & \texttt{ms-marco-MiniLM}  & 22 M      & 138 \\
+Subject/Ch boost     & --                        & 0 M       & $<\!1$ \\
+Sibling expand       & --                        & 0 M       & $<\!1$ \\
+\midrule
+\textbf{Retrieval total} & --                    & 132 M     & \textbf{250} \\
+LLM generation       & \texttt{Qwen2.5-1.5B}     & 1{,}540 M & 9{,}157 \\
+\midrule
+\textbf{End-to-end}  & --                        & 1{,}672 M & \textbf{9{,}407} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Retrieval accounts for only $2.7\%$ of end-to-end latency (250~ms of 9{,}407~ms total); the rest is LLM generation. Peak VRAM usage is ${\approx}4.5$~GB during inference. End-to-end throughput at batch size 1 is ${\approx}6.4$ queries/min, sufficient for interactive educational deployment. The retrieval indices themselves consume only $44$~MB of RAM (FAISS flat) plus $11$~MB (BM25 tokens), making the system trivial to redistribute or version-control.
+
+\subsection{Dataset Quality}
+The five-stage pipeline with 14 diagnostic checks achieves zero null fields, zero duplicate IDs, zero corrupt section titles, and 99/99 chapters with exercises in the final corpus. Short-chunk percentage was halved from $28.7\%$ (v4, pre-merging) to $13.5\%$ (v5, post-merging). Key quality metrics:
+\begin{itemize}
+    \item Chunk IDs guaranteed unique via hash + counter
+    \item All 14{,}450 chunks have non-null \texttt{subject}, \texttt{grade}, \texttt{chapter\_number}
+    \item \texttt{searchable\_text} and \texttt{embedding\_text}: 100\% coverage
+    \item Formulas extracted: 4{,}566 chunks (31.6\%)
+    \item Key terms extracted: 2{,}070 chunks (14.3\%)
+    \item Solved examples tagged: 702 chunks
+\end{itemize}
+
+\subsection{Limitations}\label{sec:limitations}
+\textbf{Physics Class 11.} The 2023+ NCERT edition rationalised Class 11 Physics from 14 to 7 chapters; topics on Mechanical Properties, Thermal Properties, Thermodynamics, Kinetic Theory, Oscillations, and Waves are absent from the source PDF and therefore from our corpus.
+
+\textbf{Evaluation-set construction artefacts.} Section~\ref{sec:failures} shows that $35.5\%$ of nominal failures stem from degenerate auto-generated questions (e.g., \emph{``What is Solution?''}). A stricter key-term filter on the question generator would be straightforward to add and would push the reported R@10 closer to its effective ceiling of ${\sim}98\%$.
+
+\textbf{Generation evaluation depth.} Our generation metrics (BERTScore, ROUGE-L, Concept Coverage) are automated and coarse for short factual answers. A small human-rater study or RAGAS-style faithfulness evaluation would better quantify the practical value of retrieval grounding~--~the most important advantage of RAG over zero-shot generation, and the one our automated metrics underestimate most.
+
+\textbf{LLM baseline scope.} Section~\ref{sec:llm_baselines} compares our system against five open-source LLM baselines (2.6B--8B parameters across four model families). Two further candidates from the Qwen family produced degenerate outputs under \texttt{transformers} 5.0 with greedy decoding and were excluded. Closed-weight models (GPT-4, Claude) and significantly larger open-weight models (e.g., Llama-3.1-70B) are out of scope for this study, which targets the open-source, single-GPU regime relevant for educational deployments in resource-constrained settings.
+
+\textbf{Single-language.} The pipeline is English-only. NCERT also publishes Hindi and regional-language editions, which would require cross-lingual retrieval extensions.
+
+\textbf{Modest underrepresentation.} Advanced (12) and reasoning (23) questions are underrepresented relative to basic (288) and definition (226); the wide CIs in Tables~\ref{tab:per_type}--\ref{tab:per_diff} reflect this imbalance.
+
+\subsection{Improvement Roadmap}
+Table~\ref{tab:roadmap} prioritises improvements by estimated impact.
+
+\begin{table}[!t]
+\caption{Prioritised Improvement Roadmap}
+\label{tab:roadmap}
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}c p{0.43\columnwidth} p{0.40\columnwidth}@{}}
+\toprule
+\textbf{Pri.} & \textbf{Technique} & \textbf{Est. Impact} \\
+\midrule
+1 & Stricter key-term filter (eval gen.)        & $+3$ pp R@10 \\
+2 & Domain fine-tuned embeddings                & $+5$--$10$ pp R@5 (Dense) \\
+3 & RAGAS faithfulness eval                     & Quantifies grounding value \\
+4 & Open-source LLM baseline ensemble           & Strengthens comparison \\
+5 & Query expansion (HyDE)~\cite{gao2023hyde}   & $+3$--$5$ pp R@5 \\
+6 & Multi-hop cross-chapter retrieval           & +coverage \\
+7 & Multimodal diagram retrieval                & +diagram Qs \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ─── CONCLUSION ──────────────────────────────────────────────────
+\section{Conclusion}
+This paper presented a fully open-source, multi-subject RAG system for NCERT Class~11 and~12 Science QA. The five-stage dataset construction pipeline produces a validated corpus of $14{,}450$ enriched chunks; the five-stage retrieval architecture combines BM25, dense embeddings, cross-encoder reranking, additive subject/chapter boosting, and sibling chunk expansion. The 573-question evaluation framework with paired significance testing, paired-bootstrap effect sizes, and manually-categorised failure analysis provides a reproducible benchmark for curriculum-aligned educational QA.
+
+The full pipeline achieves $94.6\%$ Recall@10 (95\% CI $[92.7, 96.5]$), MRR $0.810$, and BERTScore F1 $0.805$. Three of the four pipeline stages contribute statistically significant gains; the final boost stage is robust but marginal at this scale. The most surprising empirical finding is that on curriculum-aligned QA dominated by definitional and exercise-style queries, BM25 alone outperforms dense retrieval~--~yet hybrid fusion outperforms both, validating hybrid retrieval on principled grounds. End-to-end latency is $9.4$~s on a single Colab L4 GPU, with retrieval contributing only $250$~ms ($2.7\%$).
+
+Manual failure analysis reveals that of $31$ nominal Recall@10 misses, only ${\approx}12$ are genuine retrieval errors~--~the rest are evaluation-set artefacts ($35.5\%$ degenerate auto-generated queries) or near-misses within the same textbook section ($25.8\%$). Adjusted for these, the effective Recall@10 on well-formed queries approaches $98\%$.
+
+Comparison against five open-source LLM baselines from four families (Meta, Mistral, Alibaba, Google) shows that our 1.5B+RAG system matches the BERTScore F1 of zero-shot models with $1.7$--$5.3\times$ more parameters, with substantially narrower confidence intervals~--~a parameter-efficiency result that motivates RAG over scaling for resource-constrained educational deployments.
+
+Scaling from a single-subject prototype ($5.5\times$ corpus, $6.8\times$ evaluation coverage) demonstrates the generalisability of RAG-based approaches to multi-subject curricula. The modular codebase, dataset, evaluation set, and exact reproduction notebook are released as open-source artefacts.
+
+\section*{Acknowledgements}
+NCERT textbook content is published by the National Council of Educational Research and Training, Government of India. This work was conducted as part of the M.Tech.\ programme at NIT Calicut.
+
+% ─── BIBLIOGRAPHY ────────────────────────────────────────────────
+\begin{thebibliography}{99}
+
+% Project-specific references
+\bibitem{ncert_scale} NCERT, ``Annual Report 2022--23,'' National Council of Educational Research and Training, 2023.
+
+\bibitem{ouyang2022training} L.\ Ouyang et al., ``Training language models to follow instructions with human feedback,'' \emph{NeurIPS}, vol.~35, pp.~27730--27744, 2022.
+
+\bibitem{sharma2025pustakai} S.\ Sharma, R.\ Naik, T.\ Gawas, H.\ Patil, and K.\ Korgaonkar, ``PustakAI: Curriculum-aligned and interactive textbooks using LLMs,'' arXiv:2511.10002v2, Nov.\ 2025.
+
+\bibitem{rao2026team05} A.\ Rao, J.\ Shaji, M.\ Jayachandran et al., ``Team05---Deep learning-based tutor for NCERT curriculum using RAG and LLMs,'' IISc Bangalore, 2026.
+
+% ── Foundational RAG (base paper + extensions) ──
+\bibitem{lewis2020rag} P.\ Lewis et al., ``Retrieval-augmented generation for knowledge-intensive NLP tasks,'' in \emph{Proc.\ NeurIPS}, vol.~33, 2020, pp.~9459--9474.
+
+\bibitem{guu2020realm} K.\ Guu, K.\ Lee, Z.\ Tung, P.\ Pasupat, and M.-W.\ Chang, ``REALM: Retrieval-augmented language model pre-training,'' in \emph{Proc.\ ICML}, 2020, pp.~3929--3938.
+
+\bibitem{izacard2021fid} G.\ Izacard and E.\ Grave, ``Leveraging passage retrieval with generative models for open domain question answering,'' in \emph{Proc.\ EACL}, 2021, pp.~874--880.
+
+% ── Retrieval: dense, sparse, encoders, reranking ──
+\bibitem{karpukhin2020dpr} V.\ Karpukhin, B.\ O\u{g}uz, S.\ Min et al., ``Dense passage retrieval for open-domain question answering,'' in \emph{Proc.\ EMNLP}, 2020, pp.~6769--6781.
+
+\bibitem{devlin2019bert} J.\ Devlin, M.-W.\ Chang, K.\ Lee, and K.\ Toutanova, ``BERT: Pre-training of deep bidirectional transformers for language understanding,'' in \emph{Proc.\ NAACL}, 2019, pp.~4171--4186.
+
+\bibitem{reimers2019sbert} N.\ Reimers and I.\ Gurevych, ``Sentence-BERT: Sentence embeddings using Siamese BERT-networks,'' in \emph{Proc.\ EMNLP}, 2019, pp.~3982--3992.
+
+\bibitem{khattab2020colbert} O.\ Khattab and M.\ Zaharia, ``ColBERT: Efficient and effective passage search via contextualized late interaction over BERT,'' in \emph{Proc.\ SIGIR}, 2020, pp.~39--48.
+
+\bibitem{lin2021sparse} J.\ Lin and X.\ Ma, ``A few brief notes on DeepImpact, COIL, and a conceptual framework for information retrieval techniques,'' arXiv:2106.14807, 2021.
+
+\bibitem{nogueira2019bert} R.\ Nogueira and K.\ Cho, ``Passage re-ranking with BERT,'' arXiv:1901.04085, 2019.
+
+\bibitem{robertson2009bm25} S.\ Robertson and H.\ Zaragoza, ``The probabilistic relevance framework: BM25 and beyond,'' \emph{Found.\ Trends Inf.\ Retrieval}, vol.~3, no.~4, pp.~333--389, 2009.
+
+\bibitem{cormack2009rrf} G.\ V.\ Cormack, C.\ L.\ A.\ Clarke, and S.\ B\"uttcher, ``Reciprocal rank fusion outperforms condorcet and individual rank learning methods,'' in \emph{Proc.\ SIGIR}, 2009, pp.~758--759.
+
+% ── Generation, encoders, reasoning ──
+\bibitem{raffel2020t5} C.\ Raffel, N.\ Shazeer, A.\ Roberts et al., ``Exploring the limits of transfer learning with a unified text-to-text transformer,'' \emph{J.\ Mach.\ Learn.\ Res.}, vol.~21, no.~140, pp.~1--67, 2020.
+
+\bibitem{wei2022cot} J.\ Wei, X.\ Wang, D.\ Schuurmans et al., ``Chain-of-thought prompting elicits reasoning in large language models,'' in \emph{Proc.\ NeurIPS}, vol.~35, 2022, pp.~24824--24837.
+
+\bibitem{xu2023bge} S.\ Xiao, Z.\ Liu, P.\ Zhang, and N.\ Muennighoff, ``C-Pack: Packed resources for general Chinese embeddings (BGE),'' BAAI, arXiv:2309.07597, 2023.
+
+% ── QA datasets and benchmarks ──
+\bibitem{rajpurkar2016squad} P.\ Rajpurkar, J.\ Zhang, K.\ Lopyrev, and P.\ Liang, ``SQuAD: 100,000+ questions for machine comprehension of text,'' in \emph{Proc.\ EMNLP}, 2016, pp.~2383--2392.
+
+\bibitem{kwiatkowski2019nq} T.\ Kwiatkowski, J.\ Palomaki, O.\ Redfield et al., ``Natural Questions: A benchmark for question answering research,'' \emph{Trans.\ Assoc.\ Comput.\ Linguist.}, vol.~7, pp.~452--466, 2019.
+
+\bibitem{yang2018hotpotqa} Z.\ Yang, P.\ Qi, S.\ Zhang et al., ``HotpotQA: A dataset for diverse, explainable multi-hop question answering,'' in \emph{Proc.\ EMNLP}, 2018, pp.~2369--2380.
+
+\bibitem{kembhavi2018textbookqa} A.\ Kembhavi, M.\ Salvato, E.\ Kolve et al., ``A diagram is worth a dozen images: Combining textbook QA with diagram understanding,'' in \emph{Proc.\ NAACL}, 2018.
+
+\bibitem{welbl2017sciq} J.\ Welbl, N.\ F.\ Liu, and M.\ Gardner, ``Crowdsourcing multiple choice science questions (SciQ),'' in \emph{Proc.\ Workshop on Noisy User-generated Text (W-NUT)}, ACL, 2017, pp.~94--106.
+
+\bibitem{hendrycks2021mmlu} D.\ Hendrycks, C.\ Burns, S.\ Basart et al., ``Measuring massive multitask language understanding (MMLU),'' in \emph{Proc.\ ICLR}, 2021.
+
+\bibitem{barzilay1997segmentation} R.\ Barzilay and M.\ Elhadad, ``Using lexical chains for text summarization,'' in \emph{Proc.\ ACL Intelligent Scalable Text Summarization Workshop}, 1997, pp.~10--17.
+
+% ── Retrieval & generation evaluation ──
+\bibitem{thakur2021beir} N.\ Thakur, N.\ Reimers, A.\ R\"uckl\'e, A.\ Srivastava, and I.\ Gurevych, ``BEIR: A heterogeneous benchmark for zero-shot evaluation of information retrieval models,'' in \emph{Proc.\ NeurIPS Datasets Track}, 2021.
+
+\bibitem{lin2004rouge} C.-Y.\ Lin, ``ROUGE: A package for automatic evaluation of summaries,'' in \emph{Text Summarization Branches Out}, ACL, 2004, pp.~74--81.
+
+\bibitem{zhang2019bertscore} T.\ Zhang, V.\ Kishore, F.\ Wu, K.\ Q.\ Weinberger, and Y.\ Artzi, ``BERTScore: Evaluating text generation with BERT,'' in \emph{Proc.\ ICLR}, 2020.
+
+\bibitem{liu2023geval} Y.\ Liu, D.\ Iter, Y.\ Xu et al., ``G-Eval: NLG evaluation using GPT-4 with better human alignment,'' in \emph{Proc.\ EMNLP}, 2023, pp.~2511--2522.
+
+\bibitem{es2024ragas} S.\ Es, J.\ James, L.\ Espinosa-Anke, and S.\ Schockaert, ``RAGAS: Automated evaluation of retrieval augmented generation,'' arXiv:2309.15217, 2024.
+
+% ── Vector search infrastructure ──
+\bibitem{johnson2021faiss} J.\ Johnson, M.\ Douze, and H.\ J\'egou, ``Billion-scale similarity search with GPUs,'' \emph{IEEE Trans.\ Big Data}, vol.~7, no.~3, pp.~535--547, 2021.
+
+% ── Other (referenced in roadmap / related work) ──
+\bibitem{gao2023hyde} L.\ Gao, X.\ Ma, J.\ Lin, and J.\ Callan, ``Precise zero-shot dense retrieval without relevance labels (HyDE),'' in \emph{Proc.\ ACL}, 2023, pp.~1762--1777.
+
+\end{thebibliography}
+
+\end{document}

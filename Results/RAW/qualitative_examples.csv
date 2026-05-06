@@ -1,0 +1,297 @@
+id,question_x,flat_top_15_ids,flat_top_10_ids,flat_top_5_ids,expanded_count,generated_ans,q_type,retrieval_s,generation_s,subject,grade,chapter,chapter_title,question_y,type,difficulty,key_concepts,reference_chunk_id,recall_any_of,reference_answer,source,hit_5,hit_any_5,hit_10,hit_any_10,mrr_any,rouge_l,bert_score,concept_cov
+q_0016,"One end of a string of length _l_ is connected to a particle of mass _m_ and the other to a small peg on a smooth horizontal table. If the particle moves in a circle with speed _v_ the net force on the particle (directed towards the centre) is:
+(i) _T_, (ii) _T_ - _mv_²/ _l_, (iii) _T_ + _mv_²/ _l_, (iv) 0
+_T_ is the tension in the string. [Choose the correct alternative].","['physics_exercises_68_bfeb9c96bb', 'physics_exercises_68_09d7b93c4c', 'physics_exercises_69_02493548ed', 'physics_text_58_773b1d6c05', 'physics_text_62_bf9e09dc62', 'physics_figure_60_ceb40c63e3', 'physics_text_78_86252af827', 'physics_figure_57_189ce7ec1a', 'physics_text_54_c186f59cc6', 'physics_text_61_e6f6ce4429', 'physics_text_58_18653266fb', 'physics_text_64_91504f87d2', 'physics_text_59_432a3410f8', 'physics_figure_53_a6f6bc2d8e', 'physics_text_60_4774c5f67f']","['physics_exercises_68_bfeb9c96bb', 'physics_exercises_68_09d7b93c4c', 'physics_exercises_69_02493548ed', 'physics_text_58_773b1d6c05', 'physics_text_62_bf9e09dc62', 'physics_figure_60_ceb40c63e3', 'physics_text_78_86252af827', 'physics_figure_57_189ce7ec1a', 'physics_text_54_c186f59cc6', 'physics_text_61_e6f6ce4429']","['physics_exercises_68_bfeb9c96bb', 'physics_exercises_68_09d7b93c4c', 'physics_exercises_69_02493548ed', 'physics_text_58_773b1d6c05', 'physics_text_62_bf9e09dc62']",15,"The correct answer is (iii) _T_ + _mv_²/ _l_. This is derived from Newton's second law of motion, which states that the net force acting on an object equals the mass of the object multiplied by its acceleration. In this scenario, since the particle is moving in a circular path, there is both a centripetal force required to keep it moving in a circle and a tension force from the string pulling it inward toward the center of the circle. Therefore, the total net force on the particle is the sum of the centripetal force and the tension in the string.",conceptual,0.31403636932373047,4.494748592376709,physics,11,4,Laws of Motion,"One end of a string of length _l_ is connected to a particle of mass _m_ and the other to a small peg on a smooth horizontal table. If the particle moves in a circle with speed _v_ the net force on the particle (directed towards the centre) is:
+(i) _T_, (ii) _T_ - _mv_²/ _l_, (iii) _T_ + _mv_²/ _l_, (iv) 0
+_T_ is the tension in the string. [Choose the correct alternative].",conceptual,intermediate,['Laws of Motion'],physics_exercises_67_1524082829,"['physics_exercises_67_1524082829', 'physics_exercises_68_bfeb9c96bb', 'physics_exercises_68_09d7b93c4c']","Let us first guess the answer based on our common
+experience. To move a football at rest, someone must kick it.
+To throw a stone upwards, one has to give it an upward
+push. A breeze causes the branches of a tree to swing; a
+strong wind can even move heavy objects. A boat moves in a
+flowing river wit",ncert_exercise,False,True,False,True,1.0,0.14906832298136646,0.8200386762619019,0.0
+q_0060,"A plane electromagnetic wave travels in vacuum along z-direction. What can you say about the directions of its electric and magnetic field vectors? If the frequency of the wave is 30 MHz, what is its wavelength?","['physics_exercises_490_40614a8dc9', 'physics_text_482_80dd1374c5', 'physics_table_484_8bb8bf67b2', 'physics_figure_482_db6813df04', 'physics_text_482_5cbf0149d1', 'physics_text_483_334a376c04', 'physics_text_478_198aba1294', 'physics_figure_480_9567c44818', 'physics_text_483_4712fb3dc3', 'physics_text_481_d2fb08f4d4', 'physics_text_390_fc015c179a', 'physics_text_480_e9350e4217', 'physics_text_483_efa9ec730c', 'physics_summary_489_2ffec8b6cd', 'physics_text_480_925e8018c7']","['physics_exercises_490_40614a8dc9', 'physics_text_482_80dd1374c5', 'physics_table_484_8bb8bf67b2', 'physics_figure_482_db6813df04', 'physics_text_482_5cbf0149d1', 'physics_text_483_334a376c04', 'physics_text_478_198aba1294', 'physics_figure_480_9567c44818', 'physics_text_483_4712fb3dc3', 'physics_text_481_d2fb08f4d4']","['physics_exercises_490_40614a8dc9', 'physics_text_482_80dd1374c5', 'physics_table_484_8bb8bf67b2', 'physics_figure_482_db6813df04', 'physics_text_482_5cbf0149d1']",15,"For a plane electromagnetic wave traveling in vacuum along the z-direction, the electric field vector \( \mathbf{E} \) will oscillate along the x-axis, while the magnetic field vector \( \mathbf{B} \) will oscillate along the y-axis. These two vectors are orthogonal to each other and also orthogonal to the direction of propagation, which is the z-axis.
+
+Given that the frequency of the wave is 30 MHz, we can calculate the wavelength using the relationship between the speed of light \( c \), frequency \( f \), and wavelength \( \lambda \):
+
+\[ \lambda = \frac{c}{f} \]
+
+Substituting the values:
+
+\[ \lambda = \frac{3 \times 10^8 \text{ m/s}}{30 \times 10^6 \text{ Hz}} = 10 \text{ m} \]
+
+Therefore, the wavelength of the electromagnetic wave is 10 meters.",conceptual,0.2606484889984131,7.246140718460083,physics,12,8,Electromagnetic Waves,"A plane electromagnetic wave travels in vacuum along z-direction. What can you say about the directions of its electric and magnetic field vectors? If the frequency of the wave is 30 MHz, what is its wavelength?",conceptual,basic,['Electromagnetic Waves'],physics_exercises_489_935a827d16,"['physics_exercises_489_935a827d16', 'physics_exercises_490_40614a8dc9']","Maxwell formulated a set of equations involving electric and magnetic fields, and their sources, the charge and current densities. These equations are known as Maxwell's equations. Together with the Lorentz force formula (Chapter 4), they mathematically express all the basic laws of electromagnetism",ncert_exercise,False,True,False,True,1.0,0.13253012048192772,0.7937695980072021,0.0
+q_0052,"A rectangular wire loop of sides 8 cm and 2 cm with a small cut is moving out of a region of uniform magnetic field of magnitude 0.3 T directed normal to the loop. What is the emf developed across the cut if the velocity of the loop is 1 cm s⁻¹ in a direction normal to the (a) longer side, (b) shorter side of the loop? For how long does the induced voltage last in each case?","['physics_exercises_452_8ad9628b55', 'physics_figure_437_d8002f73a2', 'physics_text_434_ad2324a682', 'physics_text_437_f4d4b2b4a3', 'physics_text_435_eb0725f56d', 'physics_figure_438_9d2ed876e9', 'physics_exercises_411_ec7773f7e6', 'physics_figure_448_32152c79b7', 'physics_text_437_17cd3b3955', 'physics_figure_438_d06486c43d', 'physics_figure_452_3962ff2504', 'physics_exercises_410_4192001059', 'physics_figure_433_d1b1a4221b', 'physics_text_438_99e59148a8', 'physics_table_449_84bd06d96e']","['physics_exercises_452_8ad9628b55', 'physics_figure_437_d8002f73a2', 'physics_text_434_ad2324a682', 'physics_text_437_f4d4b2b4a3', 'physics_text_435_eb0725f56d', 'physics_figure_438_9d2ed876e9', 'physics_exercises_411_ec7773f7e6', 'physics_figure_448_32152c79b7', 'physics_text_437_17cd3b3955', 'physics_figure_438_d06486c43d']","['physics_exercises_452_8ad9628b55', 'physics_figure_437_d8002f73a2', 'physics_text_434_ad2324a682', 'physics_text_437_f4d4b2b4a3', 'physics_text_435_eb0725f56d']",15,"To solve the problem of finding the induced electromotive force (emf) in the rectangular wire loop moving out of a uniform magnetic field, we need to apply Faraday's law of induction. According to Faraday's law:
+
+\[ \text{emf} = -\frac{\Delta \Phi}{\Delta t} \]
+
+where \( \Delta \Phi \) is the change in magnetic flux and \( \Delta t \) is the time interval over which the change occurs.
+
+### Step-by-Step Solution:
+
+1. **Determine the initial and final magnetic fields:**
+
+   - Initial magnetic field (\( B_i \)) = 0.3 T (normal to the loop)
+   - Final magnetic field (\( B_f \)) = 0 T (at infinity)
+
+2. **Calculate the initial magnetic flux (\(\Phi_i\)):**
+
+   Since the magnetic field is perpendicular to the area of the loop, the initial magnetic flux is given by:
+
+   \[
+   \Phi_i = B_i \cdot A
+   \]
+
+   where \( A \) is the area of the loop.
+
+   Given that the area \( A \) of the loop is:
+
+   \[
+   A = 8 \, \text{cm} \times 2 \, \text{cm} = 16 \, \text{cm}^2 = 16 \times 10^{-4} \, \text{m}^2
+   \]
+
+   Therefore,
+
+   \[
+   \Phi_i = 0.3 \, \text{T} \times 16 \times 10^{-4} \, \text{m}^2 = 4.8 \times 10^{-4} \, \text{Wb}
+   \]
+
+3. **Calculate the final magnetic flux (\(\Phi_f\)):**
+
+   At infinity, the magnetic field is zero, so the final magnetic flux is:
+
+   \[
+   \Phi_f = 0 \, \text{",numerical,0.32994818687438965,15.0188148021698,physics,12,6,Electromagnetic Induction,"A rectangular wire loop of sides 8 cm and 2 cm with a small cut is moving out of a region of uniform magnetic field of magnitude 0.3 T directed normal to the loop. What is the emf developed across the cut if the velocity of the loop is 1 cm s⁻¹ in a direction normal to the (a) longer side, (b) shorter side of the loop? For how long does the induced voltage last in each case?",numerical,basic,['Electromagnetic Induction'],physics_exercises_450_59abaa1112,"['physics_exercises_450_59abaa1112', 'physics_exercises_451_4874c7daa7', 'physics_exercises_451_ca5101ec79']","Electromagnetic
+Induction",ncert_exercise,False,False,False,False,0.0,0.009259259259259259,0.747451663017273,0.0
+q_0389,"What is A·A? Explain in the context of Work, Energy and Power.","['physics_text_70_e05a4d425a', 'physics_text_72_e4d29fb30c', 'physics_text_72_13dfc6456f', 'physics_points_to_ponder_86_dcaadbe748', 'physics_text_72_10a7276ab5', 'physics_text_73_ac483e095c', 'physics_marginalia_72_524e800460', 'physics_text_82_66a2564e91', 'physics_text_72_5f9f270621', 'physics_text_75_e8c3680052', 'physics_text_73_b77e387a25', 'physics_text_73_e5ac40ca78', 'physics_text_75_062d0c3a3b', 'physics_text_73_6419e670c2', 'physics_text_75_73d582c8e9']","['physics_text_70_e05a4d425a', 'physics_text_72_e4d29fb30c', 'physics_text_72_13dfc6456f', 'physics_points_to_ponder_86_dcaadbe748', 'physics_text_72_10a7276ab5', 'physics_text_73_ac483e095c', 'physics_marginalia_72_524e800460', 'physics_text_82_66a2564e91', 'physics_text_72_5f9f270621', 'physics_text_75_e8c3680052']","['physics_text_70_e05a4d425a', 'physics_text_72_e4d29fb30c', 'physics_text_72_13dfc6456f', 'physics_points_to_ponder_86_dcaadbe748', 'physics_text_72_10a7276ab5']",15,"In the context of Work, Energy, and Power, \( \mathbf{A} \cdot \mathbf{A} \) represents the dot product of a vector with itself. This concept is fundamental in physics because it helps quantify the projection of one vector onto another, which is crucial when calculating work done by a force. 
+
+For any vector \(\mathbf{A}\), the dot product \(\mathbf{A} \cdot \mathbf{A}\) is defined as:
+
+\[
+\mathbf{A} \cdot \mathbf{A} = |\mathbf{A}|^2
+\]
+
+where \(|\mathbf{A}|\) denotes the magnitude (or length) of the vector \(\mathbf{A}\). This equation shows that the dot product of a vector with itself is simply the square of its magnitude.
+
+### Application to Work Done by a Force
+
+When considering the work done by a force \(\mathbf{F}\) on an object, the work \(W\) is defined as the dot product of the force vector \(\mathbf{F}\) and the displacement vector \(\mathbf{s}\):
+
+\[
+W = \mathbf{F} \cdot \mathbf{s}
+\]
+
+If the force \(\mathbf{F}\) is constant and acts along the direction of the displacement \(\mathbf{s}\), then the work done simplifies to:
+
+\[
+W =",definition,0.18106412887573242,10.816044092178345,physics,11,5,"Work, Energy and Power","What is A·A? Explain in the context of Work, Energy and Power.",definition,basic,"['A·A', 'Work, Energy and Power']",physics_text_71_90b02df5ca,['physics_text_71_90b02df5ca'],"**A·B** = (A_x**î** + A_y**ĵ** + A_z**k**)·(B_x**î** + B_y**ĵ** + B_z**k**)
+= A_xB_x + A_yB_y + A_zB_z (5.1b)
+From the definition of scalar product and
+(Eq. 5.1b) we have :
+(i) **A·A** = A_xA_x + A_yA_y + A_zA_z
+Or,
+A² = A_x² + A_y² + A_z² (5.1c)
+since **A·A** = |**A**||**A**| cos 0 = A².
+(ii) **A·B",generated_from_key_terms,False,False,False,False,0.0,0.14516129032258066,0.7829847931861877,0.0
+q_0107,"Justify that the following reactions are redox reactions:
+(a) CuO(s) + H₂(g) → Cu(s) + H₂O(g)
+(b) Fe₂O₃(s) + 3CO(g) → 2Fe(s) + 3CO₂(g)
+(c) 4BCl₃(g) + 3LiAlH₄(s) → 2B₂H₆(g) + 3LiCl(s) + 3 AlCl₃(s)
+(d) 2K(s) + F₂(g) → 2K⁺F⁻(s)
+(e) 4 NH₃(g) + 5 O₂(g) → 4NO(g) + 6H₂O(g)","['chemistry_exercises_231_0ccd183107', 'chemistry_text_220_f3815c9cab', 'chemistry_text_216_a7197b95c9', 'chemistry_text_221_3527d400be', 'chemistry_exercises_232_74a5438a14', 'chemistry_text_220_6632d8275d', 'chemistry_text_217_521ebdeeaa', 'chemistry_marginalia_228_ce7b3cf524', 'chemistry_text_215_70a19217d7', 'chemistry_text_223_ff12731d0a', 'chemistry_text_215_46786373be', 'chemistry_text_225_691c3bd53b', 'chemistry_exercises_233_b8ebcdca4f', 'chemistry_text_216_b2d71fad88', 'chemistry_text_215_816aff792b']","['chemistry_exercises_231_0ccd183107', 'chemistry_text_220_f3815c9cab', 'chemistry_text_216_a7197b95c9', 'chemistry_text_221_3527d400be', 'chemistry_exercises_232_74a5438a14', 'chemistry_text_220_6632d8275d', 'chemistry_text_217_521ebdeeaa', 'chemistry_marginalia_228_ce7b3cf524', 'chemistry_text_215_70a19217d7', 'chemistry_text_223_ff12731d0a']","['chemistry_exercises_231_0ccd183107', 'chemistry_text_220_f3815c9cab', 'chemistry_text_216_a7197b95c9', 'chemistry_text_221_3527d400be', 'chemistry_exercises_232_74a5438a14']",15,"To justify whether a given chemical reaction is a redox reaction, we need to identify changes in oxidation numbers of atoms involved in the reaction. A redox reaction involves the transfer of electrons between species, resulting in changes in oxidation numbers.
+
+### Example 1: Reaction between Copper Oxide and Hydrogen Gas
+
+Given reaction:
+\[ \text{Cu}_2\text{O}(s) + \text{H}_2(g) \rightarrow \text{Cu}(s) + \text{H}_2\text{O}(g) \]
+
+#### Step-by-Step Analysis:
+
+1. **Assign Oxidation Numbers:**
+
+   - In \( \text{Cu}_2\text{O} \):
+     - Oxygen typically has an oxidation number of -2.
+     - Let \( x \) be the oxidation number of copper.
+     - Therefore, \( 2x + (-2) = 0 \Rightarrow x = +1 \).
+     - So, \( \text{Cu}_2\text{O} \) has an overall oxidation number of +1.
+
+   - In \( \text{H}_2 \):
+     - Hydrogen has an oxidation number of +1.
+
+   - In \( \text{Cu} \):
+     - Copper has an oxidation number of +2.
+
+   - In \( \text{H}_2\text{O} \):
+     - Oxygen has an oxidation number of -2.
+     - Let \( y \) be the oxidation number of hydrogen.
+     - Therefore, \( y + (-2) = -2 \Rightarrow y = 0 \).
+     - So, \( \text{H}_2\text{O} \) has an overall oxidation number of -2.
+
+2. **Change in Oxidation Numbers:**
+
+   - Copper's oxidation number increases from +1 to +2.
+   - Oxygen's oxidation number decreases from -2 to -2.
+
+3. **Conclusion:**
+
+   Since there is a net increase in the oxidation number of copper and a net",numerical,0.2572047710418701,15.022316932678223,chemistry,11,7,Redox Reactions,"Justify that the following reactions are redox reactions:
+(a) CuO(s) + H₂(g) → Cu(s) + H₂O(g)
+(b) Fe₂O₃(s) + 3CO(g) → 2Fe(s) + 3CO₂(g)
+(c) 4BCl₃(g) + 3LiAlH₄(s) → 2B₂H₆(g) + 3LiCl(s) + 3 AlCl₃(s)
+(d) 2K(s) + F₂(g) → 2K⁺F⁻(s)
+(e) 4 NH₃(g) + 5 O₂(g) → 4NO(g) + 6H₂O(g)",numerical,intermediate,['Redox Reactions'],chemistry_exercises_231_0ccd183107,"['chemistry_exercises_231_0ccd183107', 'chemistry_marginalia_232_e793e872ae', 'chemistry_exercises_232_74a5438a14']","Chemistry deals with varieties of matter and change of one kind of matter into the other. Transformation of matter from one kind into another occurs through the various types of reactions. One important category of such reactions is **Redox Reactions**. A number of phenomena, both physical as well a",ncert_exercise,True,True,True,True,1.0,0.09523809523809523,0.7757807374000549,0.0
+q_0131,Explain briefly how +2 state becomes more and more stable in the first half of the first row transition elements with increasing atomic number?,"['chemistry_exercises_421_e66cb237ab', 'chemistry_table_402_eba124eb70', 'chemistry_text_418_6dd577958e', 'chemistry_text_408_69038f1d7c', 'chemistry_text_401_a83bf17a83', 'chemistry_text_407_37e6e76ade', 'chemistry_text_399_ecbaa739b4', 'chemistry_text_402_f62cf89157', 'chemistry_text_403_be1b4f58f6', 'chemistry_summary_420_8b9d45a2cf', 'chemistry_text_396_33603a5152', 'chemistry_table_405_0d4eae274a', 'chemistry_text_402_5a9e45f20f', 'chemistry_text_410_9e37dfcb92', 'chemistry_text_406_19a1d86a80']","['chemistry_exercises_421_e66cb237ab', 'chemistry_table_402_eba124eb70', 'chemistry_text_418_6dd577958e', 'chemistry_text_408_69038f1d7c', 'chemistry_text_401_a83bf17a83', 'chemistry_text_407_37e6e76ade', 'chemistry_text_399_ecbaa739b4', 'chemistry_text_402_f62cf89157', 'chemistry_text_403_be1b4f58f6', 'chemistry_summary_420_8b9d45a2cf']","['chemistry_exercises_421_e66cb237ab', 'chemistry_table_402_eba124eb70', 'chemistry_text_418_6dd577958e', 'chemistry_text_408_69038f1d7c', 'chemistry_text_401_a83bf17a83']",15,"In the first half of the first row transition elements, the +2 state becomes increasingly stable with increasing atomic number due to several factors:
+
+1. **Electron Configuration**: As the atomic numbers increase, the outermost electrons move further away from the nucleus, reducing repulsion between them. This leads to a lower energy level for the electrons in the +2 state compared to the +3 state.
+
+2. **Lanthanide Contraction**: Lanthanoid contraction causes the valence electrons to fill into orbitals closer to the nucleus, making the outer shell less prone to spilling over into the next shell. This results in a more stable +2 state because there's less space for unpaired electrons.
+
+3. **Energy Levels**: With each successive element, the energy levels of the outermost electrons become slightly lower due to increased nuclear charge. This makes it easier to achieve a stable configuration with fewer electrons in the outer shell, favoring the +2 state.
+
+4. **Oxidation States**: The first half of the first row transition elements typically have a tendency to form +2 ions rather than +3 ions. This is because the +2 ion has a lower formal charge and can accommodate more electrons without destabilizing the overall structure.
+
+These factors collectively contribute to the stabilization of the +2 state in the first half of the first row transition elements as the atomic number increases.",conceptual,0.274493932723999,10.065980911254883,chemistry,12,4,The d- and f-Block Elements,Explain briefly how +2 state becomes more and more stable in the first half of the first row transition elements with increasing atomic number?,conceptual,basic,['The d- and f-Block Elements'],chemistry_exercises_421_e66cb237ab,"['chemistry_exercises_421_e66cb237ab', 'chemistry_exercises_421_505bedde20', 'chemistry_exercises_422_eb6ffb1370']","The d-block of the periodic table contains the elements
+of the groups 3-12 in which the d orbitals are
+progressively filled in each of the four long periods.
+The f-block consists of elements in which 4 f and 5 f
+orbitals are progressively filled. They are placed in a
+separate panel at the bottom of ",ncert_exercise,True,True,True,True,1.0,0.13523131672597863,0.8045186996459961,0.0
+q_0452,"What is Alcohols? Explain in the context of Alcohols, Phenols and Ethers.","['chemistry_text_481_b275191398', 'chemistry_summary_509_6a51c8df2d', 'chemistry_text_481_90a271dea9', 'chemistry_text_493_5e99e87652', 'chemistry_summary_509_4eb38222d9', 'chemistry_text_492_803d02c4fd', 'chemistry_text_505_c56af2fa3e', 'chemistry_text_491_11d3f1a8df', 'chemistry_summary_509_4c304499b5', 'chemistry_text_493_61413624b5', 'chemistry_text_494_f07331107d', 'chemistry_text_492_b02f72745a', 'chemistry_text_482_9f2c293972', 'chemistry_text_481_f580bada1f', 'chemistry_text_502_78c8f77d8b']","['chemistry_text_481_b275191398', 'chemistry_summary_509_6a51c8df2d', 'chemistry_text_481_90a271dea9', 'chemistry_text_493_5e99e87652', 'chemistry_summary_509_4eb38222d9', 'chemistry_text_492_803d02c4fd', 'chemistry_text_505_c56af2fa3e', 'chemistry_text_491_11d3f1a8df', 'chemistry_summary_509_4c304499b5', 'chemistry_text_493_61413624b5']","['chemistry_text_481_b275191398', 'chemistry_summary_509_6a51c8df2d', 'chemistry_text_481_90a271dea9', 'chemistry_text_493_5e99e87652', 'chemistry_summary_509_4eb38222d9']",15,"Alcohols, phenols, and ethers are organic compounds characterized by the presence of hydroxyl (-OH) functional groups. These compounds play crucial roles in various chemical processes and industrial applications:
+
+- **Alcohols**: Contain one or more hydroxyl groups directly bonded to a carbon atom within an aliphatic system (e.g., CH₃OH). They have higher boiling points compared to similar-sized hydrocarbons due to intermolecular hydrogen bonding. Alcohols are capable of forming hydrogen bonds, making them soluble in polar solvents like water. They undergo nucleophilic substitution reactions with hydrogen halides to produce alkyl halides and dehydration to form alkenes. Primary alcohols can be oxidized to aldehydes with weak oxidizing agents, while secondary alcohols yield ketones upon oxidation.
+
+- **Phenols**: Similar to alcohols but contain the -OH group attached to a benzene ring (C₆H₅OH). Like alcohols, phenols exhibit acidity because their hydroxyl groups can donate protons to stronger bases. Their boiling points are lower than those of alcohols due to less effective hydrogen bonding. Phenols undergo similar types of reactions as alcohols, including nucleophilic substitution and deprotonation.
+
+- **Ethers**: Have the -OR group where R represents an alkyl or aryl group. Unlike alcohols and phenols, ethers do not form hydrogen bonds",definition,0.1628894805908203,10.76293134689331,chemistry,12,7,"Alcohols, Phenols and Ethers","What is Alcohols? Explain in the context of Alcohols, Phenols and Ethers.",definition,basic,"['Alcohols', 'Alcohols, Phenols and Ethers']",chemistry_text_481_338a013542,['chemistry_text_481_338a013542'],You have learnt that substitution of one or more hydrogen atom(s) from a hydrocarbon by another atom or a group of atoms result in the formation of an entirely new compound having altogether different properties and applications. **Alcohols** and **phenols** are formed when a hydrogen atom in a hydr,generated_from_key_terms,False,False,False,False,0.0,0.12955465587044535,0.8223527669906616,0.5
+q_0450,What is Atoms? Explain in the context of Haloalkanes and Haloarenes.,"['chemistry_text_447_b1dd2f45e4', 'chemistry_marginalia_469_eca0c8dae8', 'chemistry_text_451_466f561206', 'chemistry_text_467_eb57d870d5', 'chemistry_text_448_550d2bffcb', 'chemistry_marginalia_457_a0bf60362c', 'chemistry_text_449_dd04144276', 'chemistry_text_467_5f56d64bb6', 'chemistry_text_448_b820e07bfd', 'chemistry_text_449_3c04628d1b', 'chemistry_text_458_6e83f0dbd9', 'chemistry_text_449_2161044e17', 'chemistry_text_448_b39aa4d387', 'chemistry_summary_476_e767caf7d1', 'chemistry_text_459_e5c0f29806']","['chemistry_text_447_b1dd2f45e4', 'chemistry_marginalia_469_eca0c8dae8', 'chemistry_text_451_466f561206', 'chemistry_text_467_eb57d870d5', 'chemistry_text_448_550d2bffcb', 'chemistry_marginalia_457_a0bf60362c', 'chemistry_text_449_dd04144276', 'chemistry_text_467_5f56d64bb6', 'chemistry_text_448_b820e07bfd', 'chemistry_text_449_3c04628d1b']","['chemistry_text_447_b1dd2f45e4', 'chemistry_marginalia_469_eca0c8dae8', 'chemistry_text_451_466f561206', 'chemistry_text_467_eb57d870d5', 'chemistry_text_448_550d2bffcb']",15,"Atoms are fundamental units that make up all matter. In the context of Haloalkanes and Haloarenes, atoms refer to the individual elements such as carbon (C), hydrogen (H), chlorine (Cl), bromine (Br), and iodine (I) that combine to form these compounds. 
+
+Haloalkanes are organic compounds where at least one hydrogen atom has been replaced by a halogen atom (F, Cl, Br, I). This halogen can be attached to either the carbon atoms forming the alkyl chain or to the carbon atoms within the aromatic ring structure. For example, methyl chloride (CH₃Cl) contains a chlorine atom attached to a methyl group (-CH₃).
+
+Haloarenes, on the other hand, are organic compounds where at least one hydrogen atom has been replaced by a halogen atom, but this halogen is attached to a carbon atom that is part of an aromatic ring. An example would be benzyl chloride (C₆H₅CH₂Cl), where the chlorine atom is attached to the benzene ring.
+
+The presence of halogens in Haloalkanes and Haloarenes significantly alters their chemical properties due to the increased electronegativity of the halogen atoms compared to carbon. This leads to characteristic reactivity patterns observed in these compounds, including electrophilic addition reactions, nucleophilic substitution reactions, and sometimes even free radical reactions.",definition,0.21105408668518066,10.367754459381104,chemistry,12,6,Haloalkanes and Haloarenes,What is Atoms? Explain in the context of Haloalkanes and Haloarenes.,definition,basic,"['Atoms', 'Haloalkanes and Haloarenes']",chemistry_text_448_c0e184d7a8,['chemistry_text_448_c0e184d7a8'],"6.1 Classification
+---
+
+6.1.1 **On the**
+**Basis of**
+**Number of**
+**Halogen**
+**Atoms**",generated_from_key_terms,False,False,False,False,0.0,0.054298642533936646,0.7662770748138428,1.0
+q_0210,"A die is thrown. Describe the following events:
+   (i) A: a number less than 7
+   (ii) B: a number greater than 7
+   (iii) C: a multiple of 3
+   (iv) D: a number less than 4
+   (v) E: an even number greater than 4
+   (vi) F: a number not less than 3
+Also find A ∪ B, A ∩ B, B ∪ C, E ∩ F, D ∩ E, A – C, D – E, E ∩ F', F'","['maths_exercises_293_d2f117d04d', 'maths_text_292_f5bd611a6e', 'maths_exercises_294_a3d9571b48', 'maths_exercises_305_6c2f9bdb91', 'maths_text_288_1396691c53', 'maths_text_291_ed9f4b2f8b', 'maths_text_292_fb1023fbdf', 'maths_text_292_3f117534a5', 'maths_exercises_310_62bbd0b121', 'maths_text_291_525c2c05ac', 'maths_text_289_853bfc9b34', 'maths_text_291_b356980f17', 'maths_exercises_696_e88e6da382', 'maths_text_293_2ca71dabd0', 'maths_text_685_e2b618c6d4']","['maths_exercises_293_d2f117d04d', 'maths_text_292_f5bd611a6e', 'maths_exercises_294_a3d9571b48', 'maths_exercises_305_6c2f9bdb91', 'maths_text_288_1396691c53', 'maths_text_291_ed9f4b2f8b', 'maths_text_292_fb1023fbdf', 'maths_text_292_3f117534a5', 'maths_exercises_310_62bbd0b121', 'maths_text_291_525c2c05ac']","['maths_exercises_293_d2f117d04d', 'maths_text_292_f5bd611a6e', 'maths_exercises_294_a3d9571b48', 'maths_exercises_305_6c2f9bdb91', 'maths_text_288_1396691c53']",15,"To solve the given problem, let's break down each event and its description step by step:
+
+1. **Event A**: A: a number less than 7
+   - This includes all possible outcomes where the result is between 1 and 6 inclusive.
+   - Sample Space \( S \): \( \{1, 2, 3, 4, 5, 6\} \)
+
+2. **Event B**: B: a number greater than 7
+   - Since the highest number on a standard die is 6, this event cannot occur.
+   - Therefore, \( B \) is an empty set: \( B = \emptyset \).
+
+3. **Event C**: C: a multiple of 3
+   - These include the outcomes where the result is divisible by 3 without leaving a remainder.
+   - Sample Space \( S \): \( \{1, 2, 3, 4, 5, 6\} \)
+   - Multiples of 3: \( \{3, 6\} \)
+   - Thus, \( C = \{3, 6\} \).
+
+4. **Event D**: D: a number less than 4
+   - This includes outcomes where the result is between 1 and 3 inclusive.
+   - Sample Space \( S \): \( \{1, 2, 3, 4, 5, 6\} \)
+   - Less than 4: \( \{1, 2, 3\} \)
+   - Thus, \( D = \{1, 2, 3\} \).
+
+5. **Event E**: E",conceptual,0.3177952766418457,13.153278350830078,maths,11,14,Probability,"A die is thrown. Describe the following events:
+   (i) A: a number less than 7
+   (ii) B: a number greater than 7
+   (iii) C: a multiple of 3
+   (iv) D: a number less than 4
+   (v) E: an even number greater than 4
+   (vi) F: a number not less than 3
+Also find A ∪ B, A ∩ B, B ∪ C, E ∩ F, D ∩ E, A – C, D – E, E ∩ F', F'",conceptual,intermediate,['Probability'],maths_exercises_293_d2f117d04d,"['maths_exercises_293_d2f117d04d', 'maths_exercises_294_a3d9571b48', 'maths_exercises_304_07fa2ea537']","We know that the set E is a subset of the sample space S. Similarly, we find the
+following correspondence between events and subsets of S.
+
+Description of events                 Corresponding subset of 'S'
+Number of tails is exactly 2          A = {TT}
+Number of tails is atleast one        B = {HT, ",ncert_exercise,True,True,True,True,1.0,0.13953488372093023,0.7965619564056396,0.0
+q_0481,What is Mean deviation for ungrouped data? Explain in the context of Statistics.,"['maths_text_259_4a6eabe4bc', 'maths_summary_285_a23bf3cd20', 'maths_text_273_1996f53c36', 'maths_text_261_57a70e3b9b', 'maths_text_270_81b6851fd1', 'maths_summary_286_cd49ec3847', 'maths_text_258_ff3b55956f', 'maths_text_262_c339c70579', 'maths_text_257_3e4c795ea2', 'maths_text_265_cb992b0893', 'maths_text_258_394892854e', 'maths_text_259_87f51511d1', 'maths_text_267_4b74d32456', 'maths_text_259_b5629895a1', 'maths_text_260_f8020e1d46']","['maths_text_259_4a6eabe4bc', 'maths_summary_285_a23bf3cd20', 'maths_text_273_1996f53c36', 'maths_text_261_57a70e3b9b', 'maths_text_270_81b6851fd1', 'maths_summary_286_cd49ec3847', 'maths_text_258_ff3b55956f', 'maths_text_262_c339c70579', 'maths_text_257_3e4c795ea2', 'maths_text_265_cb992b0893']","['maths_text_259_4a6eabe4bc', 'maths_summary_285_a23bf3cd20', 'maths_text_273_1996f53c36', 'maths_text_261_57a70e3b9b', 'maths_text_270_81b6851fd1']",15,"Mean deviation for ungrouped data involves calculating the average of the absolute differences between each data point and a chosen reference point, typically the arithmetic mean. This statistical measure provides insight into how spread out the data points are around the mean. It's computed by taking the absolute value of the difference between each data point and the mean, then averaging those absolute differences. This approach helps quantify the variability within a dataset without being influenced by extreme values.",definition,0.20286035537719727,3.22685170173645,maths,11,13,Statistics,What is Mean deviation for ungrouped data? Explain in the context of Statistics.,definition,basic,"['Mean deviation for ungrouped data', 'Statistics']",maths_text_259_4a6eabe4bc,['maths_text_259_4a6eabe4bc'],"13.4.1 **Mean deviation for ungrouped data** Let _n_ observations be _x_₁, _x_₂, _x_₃, ..., _xₙ_.
+The following steps are involved in the calculation of mean deviation about mean or median:
+
+**Step 1** Calculate the measure of central tendency about which we are to find the mean deviation. Let it be",generated_from_key_terms,True,True,True,True,1.0,0.22900763358778625,0.822597086429596,0.5
+q_0505,What is Solution? Explain in the context of Three Dimensional Geometry.,"['maths_exercises_211_0c3d17c0ea', 'maths_exercises_213_d5d8774b21', 'maths_text_659_68f396b368', 'maths_text_656_b13b63daad', 'maths_exercises_213_e77e2a8824', 'maths_text_210_237f16e5a6', 'maths_exercises_212_05170c3981', 'maths_exercises_211_a378f09775', 'maths_text_210_6d157859aa', 'maths_exercises_211_32778292c9', 'maths_text_663_4620d89787', 'maths_text_654_15d03d7ded', 'maths_exercises_212_f04e4d507a', 'maths_text_654_f9a5bd10b1', 'maths_text_651_4622f77e33']","['maths_exercises_211_0c3d17c0ea', 'maths_exercises_213_d5d8774b21', 'maths_text_659_68f396b368', 'maths_text_656_b13b63daad', 'maths_exercises_213_e77e2a8824', 'maths_text_210_237f16e5a6', 'maths_exercises_212_05170c3981', 'maths_exercises_211_a378f09775', 'maths_text_210_6d157859aa', 'maths_exercises_211_32778292c9']","['maths_exercises_211_0c3d17c0ea', 'maths_exercises_213_d5d8774b21', 'maths_text_659_68f396b368', 'maths_text_656_b13b63daad', 'maths_exercises_213_e77e2a8824']",15,"A solution in the context of Three Dimensional Geometry refers to a method or process used to solve problems involving geometric relationships in space. This typically involves applying mathematical principles and formulas to determine properties and characteristics of shapes and structures within three-dimensional space. Solutions often involve calculations related to distances, angles, areas, volumes, and other measurements specific to three-dimensional figures. They can range from straightforward computations like finding the length of a diagonal in a rectangular prism to more complex analyses requiring vector operations, dot products, cross products, and projections. The goal is to provide a precise description or calculation that answers questions about spatial configurations and their interactions.",definition,0.19887852668762207,4.595137596130371,maths,12,11,Three Dimensional Geometry,What is Solution? Explain in the context of Three Dimensional Geometry.,definition,basic,"['Solution', 'Three Dimensional Geometry']",maths_text_654_f9a5bd10b1,['maths_text_654_f9a5bd10b1'],"**Solution** Let the d. c.'s of the lines be l, m, n. Then l = cos 90° = 0, m = cos 60° = 1/2,",generated_from_key_terms,False,False,False,False,0.0,0.05925925925925926,0.7902534604072571,1.0
+q_0183,"Find $(a + b)^4 - (a - b)^4$. Hence, evaluate $(\sqrt{3}+\sqrt{2})^4 - (\sqrt{3} - \sqrt{2})^4$.","['maths_exercises_132_e33eb457da', 'maths_exercises_132_31fe1c2890', 'maths_text_129_22a0cd777b', 'maths_text_128_4a540a1f56', 'maths_text_143_5bc829b056', 'maths_text_546_1cef8d5b80', 'maths_text_634_0f39e5c197', 'maths_text_373_d6137f1355', 'maths_text_374_a5f4bf96db', 'maths_text_78_e6a5cf1132', 'maths_text_125_49b966957c', 'maths_exercises_540_d1240d9bc6', 'maths_text_374_e5935d314d', 'maths_exercises_378_bbf8a3699b', 'maths_text_540_d4cacc59b3']","['maths_exercises_132_e33eb457da', 'maths_exercises_132_31fe1c2890', 'maths_text_129_22a0cd777b', 'maths_text_128_4a540a1f56', 'maths_text_143_5bc829b056', 'maths_text_546_1cef8d5b80', 'maths_text_634_0f39e5c197', 'maths_text_373_d6137f1355', 'maths_text_374_a5f4bf96db', 'maths_text_78_e6a5cf1132']","['maths_exercises_132_e33eb457da', 'maths_exercises_132_31fe1c2890', 'maths_text_129_22a0cd777b', 'maths_text_128_4a540a1f56', 'maths_text_143_5bc829b056']",15,"To solve the given problem, let's use the binomial theorem. The binomial theorem states that for any positive integer \( n \),
+
+\[
+(a + b)^n = \sum_{r=0}^{n} \binom{n}{r} a^{n-r} b^r
+\]
+
+We need to find \((a + b)^4 - (a - b)^4\). First, let's apply the binomial theorem to both expansions:
+
+### Expansion of \((a + b)^4\):
+
+\[
+(a + b)^4 = \sum_{r=0}^{4} \binom{4}{r} a^{4-r} b^r
+\]
+
+Calculating each term:
+
+\[
+\begin{align*}
+\text{For } r = 0: & \quad \binom{4}{0} a^4 b^0 = 1 \cdot a^4 \cdot 1 = a^4 \\
+\text{For } r = 1: & \quad \binom{4}{1} a^3 b^1 = 4 \cdot a^3 \cdot b = 4ab^3 \\
+\text{For } r = 2: & \quad \binom{4}{2} a^2 b^2 = 6 \cdot a^2 \cdot b^2 = 6a^2b^2 \\
+\text{For } r = 3: & \quad \binom{4}{3} a^1 b^3 = 4 \cdot a \cdot b^3 = 4ab^3 \\
+\text{For } r = 4: & \quad \binom{4}{4} a^0 b^4 = 1 \cdot 1 \cdot b^4 = b^4 \\
+\end{align*}
+\]
+
+So,
+
+\[
+(a + b)^4 = a^4 + 4ab^3 + 6a^2",numerical,0.27998781204223633,15.174579620361328,maths,11,7,Binomial Theorem,"Find $(a + b)^4 - (a - b)^4$. Hence, evaluate $(\sqrt{3}+\sqrt{2})^4 - (\sqrt{3} - \sqrt{2})^4$.",numerical,intermediate,['Binomial Theorem'],maths_exercises_131_a0385c1de4,"['maths_exercises_131_a0385c1de4', 'maths_exercises_131_df8cc969be', 'maths_exercises_132_7e94a2eef2']","## 7.2 Binomial Theorem for Positive Integral Indices
+
+Let us have a look at the following identities done earlier:
+
+(a+b)⁰ = 1
+(a+b)¹ = a + b
+(a+b)² = a² + 2ab + b²
+(a+b)³ = a³ + 3a²b + 3ab² + b³
+(a+b)⁴ = (a + b)³ (a + b) = a⁴ + 4a³b + 6a²b² + 4ab³ + b⁴
+
+a + b ≠ 0
+
+Blaise Pascal
+(1623-1662)",ncert_exercise,False,False,False,False,0.0,0.26086956521739135,0.8102368712425232,1.0
+q_0376,Name the three important components of biodiversity.,"['biology_exercises_477_0acf1e7206', 'biology_text_474_da49486b24', 'biology_exercises_478_efc2067cef', 'biology_summary_476_015a8a471d', 'biology_text_468_7e008c183b', 'biology_text_474_7dce1b3a15', 'biology_figure_469_5e8de29ff1', 'biology_summary_477_f1443af6eb', 'biology_text_469_3a190ff099', 'biology_text_467_11d1c9006f', 'biology_text_467_655dae7974', 'biology_summary_477_daf4f32b87', 'biology_text_468_d005da1cc0', 'biology_text_471_484d709b67', 'biology_text_3_b506967b6c']","['biology_exercises_477_0acf1e7206', 'biology_text_474_da49486b24', 'biology_exercises_478_efc2067cef', 'biology_summary_476_015a8a471d', 'biology_text_468_7e008c183b', 'biology_text_474_7dce1b3a15', 'biology_figure_469_5e8de29ff1', 'biology_summary_477_f1443af6eb', 'biology_text_469_3a190ff099', 'biology_text_467_11d1c9006f']","['biology_exercises_477_0acf1e7206', 'biology_text_474_da49486b24', 'biology_exercises_478_efc2067cef', 'biology_summary_476_015a8a471d', 'biology_text_468_7e008c183b']",15,"The three important components of biodiversity are:
+
+1. Genetic Diversity - This refers to the variability among genes within a population, between populations, and across species. It includes differences in DNA sequences, which can affect traits such as resistance to diseases or environmental changes.
+
+2. Species Diversity - This component involves the variety of living organisms in a given environment. It measures the number of distinct species present in a habitat, including both flora and fauna.
+
+3. Ecosystem Diversity - This encompasses the variety of ecosystems found on Earth, each with unique characteristics influenced by factors such as climate, geology, and human activities. Ecosystems include habitats ranging from oceans and lakes to grasslands and forests.",factual,0.2361304759979248,5.010543584823608,biology,12,13,Biodiversity and Conservation,Name the three important components of biodiversity.,factual,basic,['Biodiversity and Conservation'],biology_exercises_477_0acf1e7206,"['biology_exercises_477_0acf1e7206', 'biology_exercises_478_efc2067cef', 'biology_exercises_479_a53ac17af5']","BIODIVERSITY AND CONSERVATION
+
+combined diversity at all the levels of biological organisation.
+The most important of them are-
+
+(i) **Genetic diversity**: A single species might show high diversity at the genetic level over its distributional range. The genetic variation shown by the medicinal plan",ncert_exercise,True,True,True,True,1.0,0.15384615384615383,0.8347258567810059,0.0
+q_0540,What is Ammonotelism? Explain in the context of Excretory Products and Their Elimination.,"['biology_text_204_36f5a5bb70', 'biology_text_212_befa92d59d', 'biology_exercises_215_d19cf97117', 'biology_exercises_214_379be8a2ea', 'biology_text_204_72ef5505ff', 'biology_text_213_24a3f8d6d7', 'biology_summary_213_da2f8ffbf9', 'biology_summary_214_bd3eff88cc', 'biology_summary_214_a933c286ff', 'biology_summary_213_2f3bdf54de', 'biology_text_212_a831988f5f', 'biology_text_211_fbfa0001bb', 'biology_text_208_bc8c4c353b', 'biology_text_213_dd784203d9', 'biology_text_210_107d5f2a92']","['biology_text_204_36f5a5bb70', 'biology_text_212_befa92d59d', 'biology_exercises_215_d19cf97117', 'biology_exercises_214_379be8a2ea', 'biology_text_204_72ef5505ff', 'biology_text_213_24a3f8d6d7', 'biology_summary_213_da2f8ffbf9', 'biology_summary_214_bd3eff88cc', 'biology_summary_214_a933c286ff', 'biology_summary_213_2f3bdf54de']","['biology_text_204_36f5a5bb70', 'biology_text_212_befa92d59d', 'biology_exercises_215_d19cf97117', 'biology_exercises_214_379be8a2ea', 'biology_text_204_72ef5505ff']",15,"Ammonotelism refers to the natural tendency of certain organisms to excrete ammonia rather than more toxic compounds such as urea or uric acid. This phenomenon is observed in many bony fishes, aquatic amphibians, and aquatic insects. In these species, ammonia is readily soluble and diffuses across body surfaces or through gill surfaces as ammonium ions. While ammonia is highly toxic, it is easily eliminated due to its solubility. However, terrestrial adaptation required the development of less toxic nitrogenous waste products like urea and uric acid, leading to the classification of mammals, many terrestrial amphibians, and marine fishes as **ureotelic** or **uricotelic**, respectively.",definition,0.2411820888519287,5.273395299911499,biology,11,16,Excretory Products and Their Elimination,What is Ammonotelism? Explain in the context of Excretory Products and Their Elimination.,definition,basic,"['Ammonotelism', 'Excretory Products and Their Elimination']",biology_text_204_36f5a5bb70,['biology_text_204_36f5a5bb70'],"The process of excreting ammonia is **Ammonotelism**. Many bony fishes, aquatic amphibians and aquatic insects are **ammonotelic** in nature. Ammonia, as it is readily soluble, is generally excreted by diffusion across body surfaces or through gill surfaces (in fish) as ammonium ions. Kidneys do not",generated_from_key_terms,True,True,True,True,1.0,0.3945578231292517,0.8967230916023254,0.5
+q_0533,What is respiration? Explain in the context of Respiration in Plants.,"['biology_text_154_a7471c6726', 'biology_summary_164_47e02e4305', 'biology_text_160_76077ddd44', 'biology_text_156_1b5bcac8b9', 'biology_text_154_6e77c7e346', 'biology_text_153_df96fbed6a', 'biology_text_152_979f6064aa', 'biology_text_156_9898f8a718', 'biology_text_159_3e53d6fb35', 'biology_text_157_2f24c3ad41', 'biology_text_157_46b5827a0c', 'biology_text_157_1342445d16', 'biology_text_158_13a8177e20', 'biology_summary_163_e47effc2cf', 'biology_text_154_c538dabedf']","['biology_text_154_a7471c6726', 'biology_summary_164_47e02e4305', 'biology_text_160_76077ddd44', 'biology_text_156_1b5bcac8b9', 'biology_text_154_6e77c7e346', 'biology_text_153_df96fbed6a', 'biology_text_152_979f6064aa', 'biology_text_156_9898f8a718', 'biology_text_159_3e53d6fb35', 'biology_text_157_2f24c3ad41']","['biology_text_154_a7471c6726', 'biology_summary_164_47e02e4305', 'biology_text_160_76077ddd44', 'biology_text_156_1b5bcac8b9', 'biology_text_154_6e77c7e346']",15,"Respiration is the metabolic process by which cells break down organic compounds, primarily carbohydrates, to produce energy in the form of adenosine triphosphate (ATP), while releasing waste products such as carbon dioxide and water. In the context of Respiration in Plants, this process occurs within the chloroplasts of leaf cells, specifically involving the Calvin Cycle and the Electron Transport Chain. 
+
+The primary pathway of cellular respiration in plants involves glycolysis, followed by the Krebs cycle (also known as the citric acid cycle), and finally the electron transport chain leading to oxygen consumption. This entire process is crucial for converting the chemical energy stored in glucose into usable energy for the plant's activities. The efficiency of this process is enhanced by the presence of enzymes and organelles designed to maximize energy extraction and minimize wastage.",definition,0.21234703063964844,6.126600742340088,biology,11,12,Respiration in Plants,What is respiration? Explain in the context of Respiration in Plants.,definition,basic,"['respiration', 'Respiration in Plants']",biology_text_153_f88b2caa5d,['biology_text_153_f88b2caa5d'],"Photosynthesis, of course, takes place within the chloroplasts (in the eukaryotes), whereas the breakdown of complex molecules to yield energy takes place in the cytoplasm and in the mitochondria (also only in eukaryotes). The breaking of the C-C bonds of complex compounds through oxidation within t",generated_from_key_terms,False,False,False,False,0.0,0.17582417582417584,0.8404608964920044,1.0
+q_0556,What is DNA Fingerprinting? Explain in the context of Molecular Basis of Inheritance.,"['biology_summary_359_6a636aeaf0', 'biology_text_356_52c635cc6c', 'biology_text_357_e5d69c16f6', 'biology_text_356_c5fe9f585e', 'biology_text_358_d7eaa4caa0', 'biology_text_355_43c74e6d16', 'biology_text_358_6177f296a2', 'biology_text_356_7af6480f51', 'biology_text_358_53f2e25c01', 'biology_summary_360_b97cc6b9b1', 'biology_text_357_3822a77579', 'biology_text_357_57954ed5c7', 'biology_figure_358_de9fdc75f2', 'biology_summary_359_e23ecc1d28', 'biology_text_330_c2f0fd2222']","['biology_summary_359_6a636aeaf0', 'biology_text_356_52c635cc6c', 'biology_text_357_e5d69c16f6', 'biology_text_356_c5fe9f585e', 'biology_text_358_d7eaa4caa0', 'biology_text_355_43c74e6d16', 'biology_text_358_6177f296a2', 'biology_text_356_7af6480f51', 'biology_text_358_53f2e25c01', 'biology_summary_360_b97cc6b9b1']","['biology_summary_359_6a636aeaf0', 'biology_text_356_52c635cc6c', 'biology_text_357_e5d69c16f6', 'biology_text_356_c5fe9f585e', 'biology_text_358_d7eaa4caa0']",15,"DNA Fingerprinting is a molecular technique used to identify individuals based on variations in DNA sequences. It relies on the concept of polymorphism, which refers to variations within a gene pool. DNA Fingerprinting utilizes repetitive DNA sequences, particularly Variable Number of Tandem Repeats (VNTRs), which exhibit high degrees of polymorphism among individuals. These sequences are separated through density gradient centrifugation and analyzed using techniques like Southern blot hybridization. The resulting patterns, or fingerprints, are unique to each individual and serve as powerful tools in forensic science, genetic diversity studies, and evolutionary biology.",definition,0.22484898567199707,4.313399791717529,biology,12,5,Molecular Basis of Inheritance,What is DNA Fingerprinting? Explain in the context of Molecular Basis of Inheritance.,definition,basic,"['DNA Fingerprinting', 'Molecular Basis of Inheritance']",biology_text_330_c2f0fd2222,['biology_text_330_c2f0fd2222'],"MOLECULAR BASIS OF
+INHERITANCE
+
+5.1 *The DNA*
+5.2 *The Search for Genetic Material*
+5.3 *RNA World*
+5.4 *Replication*
+5.5 *Transcription*
+5.6 *Genetic Code*
+5.7 *Translation*
+5.8 *Regulation of Gene Expression*
+5.9 *Human Genome Project*
+5.10 *DNA Fingerprinting*",generated_from_key_terms,False,False,False,False,0.0,0.10071942446043165,0.7972894310951233,0.5

@@ -1,0 +1,28 @@
+id,subject,chapter,type,question_x,reference_chunk_id,failure_mode
+q_0032,physics,1,conceptual,"(a) Explain the meaning of the statement 'electric charge of a body is quantised'.
+(b) Why can one ignore quantisation of electric charge when dealing with macroscopic i.e., large scale charges?",physics_exercises_318_4b327bd9cd,exercise_vs_concept
+q_0051,physics,6,numerical,"A long solenoid with 15 turns per cm has a small loop of area 2.0 cm² placed inside the solenoid normal to its axis. If the current carried by the solenoid changes steadily from 2.0 A to 4.0 A in 0.1 s, what is the induced emf in the loop while the current is changing?",physics_exercises_450_59abaa1112,long_multipart_numerical
+q_0052,physics,6,numerical,"A rectangular wire loop of sides 8 cm and 2 cm with a small cut is moving out of a region of uniform magnetic field of magnitude 0.3 T directed normal to the loop. What is the emf developed across the cut if the velocity of the loop is 1 cm s⁻¹ in a direction normal to the (a) longer side, (b) shorter side of the loop? For how long does the induced voltage last in each case?",physics_exercises_450_59abaa1112,long_multipart_numerical
+q_0389,physics,5,definition,"What is A·A? Explain in the context of Work, Energy and Power.",physics_text_71_90b02df5ca,other_semantic_miss
+q_0227,maths,4,conceptual,"If
+$ \begin{vmatrix} x & 2 \\ 18 & x \end{vmatrix} = \begin{vmatrix} 6 & 2 \\ 18 & 6 \end{vmatrix} $, then $x$ is equal to
+
+(A) 6
+(B) ± 6
+(C) - 6
+(D) 0
+Write Minors and Cofactors of the elements of following determinants:",maths_exercises_394_46ed9e0422,other_semantic_miss
+q_0533,biology,12,definition,What is respiration? Explain in the context of Respiration in Plants.,biology_text_153_f88b2caa5d,other_semantic_miss
+q_0460,maths,1,definition,What is Solution? Explain in the context of Sets.,maths_text_3_716f9e2d59,other_semantic_miss
+q_0019,physics,5,conceptual,"Underline the correct alternative:
+(a) When a conservative force does positive work on a body, the potential energy of the body increases/decreases/remains unaltered.
+(b) Work done by a body against friction always results in a loss of its kinetic/potential energy.
+(c) The rate of change of total momentum of a many-particle system is proportional to the external force/sum of the internal forces on the system.
+(d) In an inelastic collision of two bodies, the quantities which do not change after t",physics_marginalia_88_29effebe17,other_semantic_miss
+q_0239,maths,7,conceptual,$ \int x^2(1 - \frac{1}{x^2}) dx $,maths_exercises_508_6be15f4fc5,short_ambiguous_question
+q_0220,maths,2,conceptual,"If sin⁻¹ x = y, then
+
+(A) 0 ≤ y ≤ π
+(B) -π/2 ≤ y ≤ π/2
+(C) 0 < y < π
+(D) -π/2 < y < π/2",maths_exercises_338_d73d016780,short_ambiguous_question

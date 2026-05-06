@@ -1,0 +1,5 @@
+failure_mode,count
+other_semantic_miss,26
+long_multipart_numerical,2
+short_ambiguous_question,2
+exercise_vs_concept,1

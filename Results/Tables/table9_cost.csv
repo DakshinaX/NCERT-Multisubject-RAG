@@ -1,0 +1,9 @@
+Stage,Model,Params (M),Latency (ms),95th pctl
+BM25 retrieval,rank_bm25,0,25.0 (in-RAM),-
+Dense retrieval,bge-base-en-v1.5,110,75.1,100.3
+Cross-encoder rerank,ms-marco-MiniLM-L-6-v2,22,137.6,183.9
+Subject/Ch boost,-,0,<1,<1
+Sibling expand,-,0,<1,<1
+TOTAL retrieval,-,132,250.3,334.3
+LLM generation,Qwen2.5-1.5B-Instruct (fp16),1540,9156.7,15114.7
+END-TO-END,-,1672,9407.0,15449.0
